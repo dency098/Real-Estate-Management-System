@@ -1,0 +1,904 @@
+@{
+    var userId = Context.Session.GetString("UserId");
+    var userName = Context.Session.GetString("FullName");
+    var userImage = Context.Session.GetString("UserImage");
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - RealEstate</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="@Url.Content("~/css/bootstrap.min.css")" />
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Fontawesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="@Url.Content("~/css/styles.css")" />
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #0f172a;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --muted: #64748b;
+            --white: #ffffff;
+            --shadow: 0 10px 35px rgba(15, 23, 42, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif !important;
+            background: #f8fafc;
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none !important;
+        }
+
+        /* ================= HEADER ================= */
+
+        .main-header {
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            background: rgba(255,255,255,.92);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(226,232,240,.7);
+        }
+
+        .header-container {
+            padding: 14px 30px;
+        }
+
+        .logo img {
+            height: 45px;
+        }
+
+        /* NAV */
+
+        .main-menu ul {
+            list-style: none;
+            gap: 28px;
+        }
+
+        .main-menu a {
+            color: var(--text);
+            font-weight: 600;
+            font-size: 15px;
+            position: relative;
+            transition: .3s;
+        }
+
+            .main-menu a:hover {
+                color: var(--primary);
+            }
+
+            .main-menu a::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                bottom: -6px;
+                width: 0%;
+                height: 2px;
+                background: var(--primary);
+                transition: .3s;
+            }
+
+            .main-menu a:hover::after {
+                width: 100%;
+            }
+
+        /* BUTTON */
+
+        .submit-btn {
+            background: linear-gradient(135deg,var(--primary),#4f46e5);
+            color: white !important;
+            padding: 13px 22px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 14px;
+            transition: .3s;
+            box-shadow: 0 10px 25px rgba(37,99,235,.25);
+        }
+
+            .submit-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 18px 30px rgba(37,99,235,.35);
+            }
+
+        /* PROFILE */
+
+        .profile-trigger {
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 50px;
+            padding: 6px 12px 6px 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: .3s;
+        }
+
+            .profile-trigger:hover {
+                border-color: #bfdbfe;
+                background: #eff6ff;
+            }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+
+            .profile-avatar img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        .profile-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        /* DROPDOWN */
+
+        .dropdown-menu {
+            border: none;
+            border-radius: 22px;
+            padding: 12px;
+            min-width: 270px;
+            box-shadow: var(--shadow);
+            margin-top: 14px;
+        }
+
+        .dropdown-header-custom {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px;
+            border-bottom: 1px solid #edf2f7;
+            margin-bottom: 10px;
+        }
+
+        .dropdown-user-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .dropdown-item {
+            padding: 12px 14px;
+            border-radius: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: .25s;
+        }
+
+            .dropdown-item:hover {
+                background: #eff6ff;
+                color: var(--primary);
+                transform: translateX(4px);
+            }
+
+            .dropdown-item i {
+                width: 18px;
+            }
+
+        .logout:hover {
+            background: #fef2f2 !important;
+            color: #dc2626 !important;
+        }
+
+        /* NOTIFICATION */
+
+        .notification-btn {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: .3s;
+        }
+
+            .notification-btn:hover {
+                background: #eff6ff;
+                border-color: #bfdbfe;
+            }
+
+        .notification-count {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            min-width: 20px;
+            height: 20px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* NOTIFICATION DROPDOWN */
+
+        .notification-dropdown {
+            position: absolute;
+            top: 65px;
+            right: 0;
+            width: 360px;
+            background: white;
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            display: none;
+            overflow: hidden;
+            z-index: 9999;
+        }
+
+        .notification-header {
+            padding: 18px;
+            border-bottom: 1px solid #edf2f7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .notification-header h6 {
+                margin: 0;
+                font-size: 16px;
+                font-weight: 700;
+            }
+
+        .notification-body {
+            max-height: 420px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            display: flex;
+            gap: 14px;
+            padding: 18px;
+            border-bottom: 1px solid #f1f5f9;
+            transition: .25s;
+        }
+
+            .notification-item:hover {
+                background: #f8fafc;
+            }
+
+        .notif-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg,var(--primary),#4f46e5);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .notif-content p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .notif-content small {
+            color: var(--muted);
+        }
+
+        .notif-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-accept,
+        .btn-reject {
+            border: none;
+            padding: 7px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .btn-accept {
+            background: #22c55e;
+        }
+
+        .btn-reject {
+            background: #ef4444;
+        }
+
+        /* FOOTER */
+
+        .footer {
+            background: #0f172a;
+            margin-top: 80px;
+            color: white;
+        }
+
+        .footer-top {
+            padding: 80px 0 50px;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+        }
+
+        .footer-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .footer p,
+        .footer a {
+            color: rgba(255,255,255,.7);
+            font-size: 14px;
+            transition: .3s;
+        }
+
+            .footer a:hover {
+                color: white;
+                padding-left: 5px;
+            }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+            .footer-links li {
+                margin-bottom: 12px;
+            }
+
+        .social-icons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+            .social-icons a {
+                width: 42px;
+                height: 42px;
+                border-radius: 12px;
+                background: rgba(255,255,255,.08);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                transition: .3s;
+            }
+
+                .social-icons a:hover {
+                    background: var(--primary);
+                    transform: translateY(-3px);
+                }
+
+        .newsletter-box {
+            background: rgba(255,255,255,.05);
+            padding: 10px;
+            border-radius: 16px;
+            display: flex;
+            margin-top: 20px;
+        }
+
+            .newsletter-box input {
+                border: none;
+                background: transparent;
+                width: 100%;
+                color: white;
+                padding: 10px;
+                outline: none;
+            }
+
+            .newsletter-box button {
+                border: none;
+                background: var(--primary);
+                width: 48px;
+                border-radius: 12px;
+                color: white;
+            }
+
+        .bottom-footer {
+            padding: 22px 0;
+        }
+
+        .copyright {
+            color: rgba(255,255,255,.6);
+            font-size: 14px;
+        }
+
+        /* MOBILE */
+
+        @@media(max-width:991px) {
+
+            .main-menu {
+                display: none;
+            }
+
+            .header-container {
+                padding: 14px 18px;
+            }
+
+            .notification-dropdown {
+                width: 320px;
+                right: -60px;
+            }
+
+            .submit-btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="main-header">
+        <div class="container-fluid header-container">
+            <div class="d-flex justify-content-between align-items-center">
+
+                <!-- LOGO -->
+                <div class="logo">
+                    <a asp-controller="User" asp-action="Index">
+                        <img src="@Url.Content("~/images/logo/logo@2x.png")" />
+                    </a>
+                </div>
+
+                <!-- MENU -->
+                <nav class="main-menu">
+                    <ul class="d-flex align-items-center m-0">
+                        <li><a asp-controller="User" asp-action="Index">Home</a></li>
+                        <li><a asp-controller="User" asp-action="Properties">Properties</a></li>
+                        <li><a asp-controller="User" asp-action="Listing">Listings</a></li>
+                        <li><a asp-controller="User" asp-action="AboutUs">About</a></li>
+                        <li><a asp-controller="User" asp-action="ContactUs">Contact</a></li>
+                    </ul>
+                </nav>
+
+                <!-- RIGHT -->
+                <div class="d-flex align-items-center gap-3 position-relative">
+
+                    <!-- NOTIFICATION -->
+                    <div class="position-relative">
+
+                        @{
+                            int enquiryNotifCount = ViewBag.Notifications?.Count ?? 0;
+                            int generalNotifCount = ViewBag.GeneralNotifications?.Count ?? 0;
+                            int totalNotifCount = enquiryNotifCount + generalNotifCount;
+                        }
+
+                        <button id="notificationBtn" class="notification-btn">
+                            <i class="fa-solid fa-bell"></i>
+
+                            @if (totalNotifCount > 0)
+                            {
+                                <span class="notification-count">
+                                    @totalNotifCount
+                                </span>
+                            }
+                        </button>
+
+                        <!-- DROPDOWN -->
+                        <div id="notificationBox" class="notification-dropdown">
+
+                            <div class="notification-header">
+                                <h6>Notifications</h6>
+                                <span class="text-primary fw-semibold">
+                                    @totalNotifCount New
+                                </span>
+                            </div>
+
+                            <div class="notification-body">
+
+                                @if (totalNotifCount > 0)
+                                {
+                                    @if (ViewBag.GeneralNotifications != null)
+                                    {
+                                        @foreach (var notif in ViewBag.GeneralNotifications)
+                                        {
+                                            <div class="notification-item">
+                                                <div class="notif-avatar bg-warning text-dark">
+                                                    <i class="fa-solid fa-bell"></i>
+                                                </div>
+                                                <div class="notif-content">
+                                                    <p style="font-size: 13px;">@notif.Message</p>
+                                                    <small>@notif.CreatedAt.ToString("dd MMM yyyy hh:mm tt")</small>
+                                                    
+                                                    <div class="notif-actions mt-2">
+                                                        <form asp-controller="User" asp-action="MarkAsRead" method="post">
+                                                            <input type="hidden" name="id" value="@notif.NotificationId" />
+                                                            <button type="submit" class="btn btn-sm btn-outline-secondary" style="font-size: 11px; padding: 2px 8px;">Dismiss</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+
+                                    @if (ViewBag.Notifications != null)
+                                    {
+                                        @foreach (var item in ViewBag.Notifications)
+                                        {
+                                            <div class="notification-item">
+
+                                                <div class="notif-avatar">
+                                                    @(item.SenderUser?.FullName?.Substring(0, 1).ToUpper() ?? "U")
+                                                </div>
+
+                                                <div class="notif-content">
+
+                                                    <p>
+                                                        <strong>
+                                                            @(item.SenderUser?.FullName ?? "User")
+                                                        </strong>
+                                                        sent enquiry for
+                                                        <strong>
+                                                            @(item.Property?.Title ?? "Property")
+                                                        </strong>
+                                                    </p>
+                                                 
+
+                                                    <small>
+                                                        Status : @item.Status
+                                                    </small>
+
+                                                    @if (item.Status == "Pending")
+                                                    {
+                                                        <div class="notif-actions">
+
+                                                            <form asp-controller="Enquiry"
+                                                                  asp-action="Approve"
+                                                                  method="post">
+
+                                                                @Html.AntiForgeryToken()
+
+                                                                <input type="hidden"
+                                                                       name="id"
+                                                                       value="@item.EnquiryId" />
+
+                                                                <button type="submit"
+                                                                        class="btn-accept">
+                                                                    Accept
+                                                                </button>
+                                                            </form>
+
+                                                            <form asp-controller="Enquiry"
+                                                                  asp-action="Reject"
+                                                                  method="post">
+
+                                                                @Html.AntiForgeryToken()
+
+                                                                <input type="hidden"
+                                                                       name="id"
+                                                                       value="@item.EnquiryId" />
+
+                                                                <button type="submit"
+                                                                        class="btn-reject">
+                                                                    Reject
+                                                                </button>
+                                                            </form>
+
+                                                        </div>
+                                                    }
+
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="text-center p-5">
+                                        <i class="fa-regular fa-bell-slash fa-2x mb-3 text-secondary"></i>
+                                        <p class="text-muted">No notifications found</p>
+                                    </div>
+                                }
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- LOGIN -->
+                    @if (string.IsNullOrEmpty(userId))
+                    {
+                        <a asp-controller="Account"
+                           asp-action="Login"
+                           class="submit-btn">
+                            <i class="fa fa-user"></i>
+                            Sign In
+                        </a>
+                    }
+                    else
+                    {
+                        <!-- PROFILE -->
+                        <div class="dropdown">
+
+                            <button class="profile-trigger dropdown-toggle"
+                                    data-bs-toggle="dropdown">
+
+                                <div class="profile-avatar">
+
+                                    @if (!string.IsNullOrEmpty(userImage))
+                                    {
+                                        <img src="@Url.Content(userImage)" />
+                                    }
+                                    else
+                                    {
+                                        @(userName?.Substring(0, 1).ToUpper())
+                                    }
+
+                                </div>
+
+                                <div class="profile-name">
+                                    @userName
+                                </div>
+
+                            </button>
+
+                            <ul class="dropdown-menu dropdown-menu-end">
+
+                                <li class="dropdown-header-custom">
+
+                                    <img class="dropdown-user-img"
+                                         src="@(string.IsNullOrEmpty(userImage)
+                                                                                  ? Url.Content("~/images/profile/default.png")
+                                                                                  : Url.Content(userImage))" />
+
+                                <div>
+                                    <h6 class="mb-0">@userName</h6>
+                                    <small class="text-muted">
+                                        Welcome Back 👋
+                                    </small>
+                                </div>
+
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-controller="User"
+                                       asp-action="Profile">
+
+                                        <i class="fa fa-user"></i>
+                                        My Profile
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-controller="User"
+                                       asp-action="Property">
+
+                                        <i class="fa fa-plus"></i>
+                                        Add Property
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-controller="User"
+                                       asp-action="MyProperties">
+
+                                        <i class="fa fa-building"></i>
+                                        My Properties
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-controller="User"
+                                       asp-action="Favorites">
+
+                                        <i class="fa fa-heart"></i>
+                                        My Favorites
+                                    </a>
+                                </li>
+
+                                <li><hr class="dropdown-divider"></li>
+
+                                <li>
+                                    <a class="dropdown-item logout"
+                                       asp-controller="Account"
+                                       asp-action="Logout">
+
+                                        <i class="fa fa-right-from-bracket"></i>
+                                        Logout
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </div>
+                                        }
+
+                    <!-- SUBMIT -->
+                    <a asp-controller="User"
+                       asp-action="Property"
+                       class="submit-btn">
+                        Submit Property
+                    </a>
+
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- BODY -->
+    <main>
+        @RenderBody()
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+
+        <div class="container footer-top">
+            <div class="row g-5">
+
+                <!-- ABOUT -->
+                <div class="col-lg-4">
+
+                    <img src="@Url.Content("~/images/logo/logo-footer@2x.png")"
+                         style="height:50px;" />
+
+                    <p class="mt-4">
+                        Premium real estate platform for buying,
+                        selling, and renting luxury properties.
+                    </p>
+
+                    <div class="social-icons">
+
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-x-twitter"></i></a>
+
+                    </div>
+
+                </div>
+
+                <!-- LINKS -->
+                <div class="col-lg-2">
+                    <div class="footer-title">Quick Links</div>
+
+                    <ul class="footer-links">
+                        <li><a asp-controller="User" asp-action="Index">Home</a></li>
+                        <li><a asp-controller="User" asp-action="Properties">Properties</a></li>
+                        <li><a asp-controller="User" asp-action="AboutUs">About</a></li>
+                        <li><a asp-controller="User" asp-action="ContactUs">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- COMPANY -->
+                <div class="col-lg-2">
+                    <div class="footer-title">Company</div>
+
+                    <ul class="footer-links">
+                        <li><a href="#">Buy Property</a></li>
+                        <li><a href="#">Rent Property</a></li>
+                        <li><a href="#">Sell Property</a></li>
+                        <li><a href="#">Agents</a></li>
+                    </ul>
+                </div>
+
+                <!-- NEWSLETTER -->
+                <div class="col-lg-4">
+
+                    <div class="footer-title">
+                        Newsletter
+                    </div>
+
+                    <p>
+                        Subscribe and get latest property updates.
+                    </p>
+
+                    <div class="newsletter-box">
+
+                        <input type="email"
+                               placeholder="Your email address" />
+
+                        <button>
+                            <i class="fa fa-paper-plane"></i>
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- BOTTOM -->
+        <div class="container bottom-footer">
+
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+                <div class="copyright">
+                    © 2026 RealEstate. All rights reserved.
+                </div>
+
+                <div class="d-flex gap-4">
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms</a>
+                    <a href="#">Cookies</a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+    <!-- JS -->
+    <script src="@Url.Content("~/js/jquery.min.js")"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+
+        const btn = document.getElementById("notificationBtn");
+        const box = document.getElementById("notificationBox");
+
+        btn.addEventListener("click", function (e) {
+            e.stopPropagation();
+
+            if (box.style.display === "block") {
+                box.style.display = "none";
+            }
+            else {
+                box.style.display = "block";
+            }
+        });
+
+        document.addEventListener("click", function () {
+            box.style.display = "none";
+        });
+
+        box.addEventListener("click", function (e) {
+            e.stopPropagation();
+        });
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,347 @@
+@model IEnumerable<dynamic>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Deal History";
+    ViewData["ActivePage"] = "Deal History";
+}
+
+<style>
+    /* Enterprise Table Styles */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border-color);
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .page-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-main);
+        margin: 0;
+    }
+
+    .page-subtitle {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        margin: 4px 0 0 0;
+    }
+
+    .section-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table th {
+        background: #f8fafc;
+        padding: 12px 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .data-table td {
+        padding: 16px 20px;
+        font-size: 0.875rem;
+        color: var(--text-main);
+        border-bottom: 1px solid var(--border-color);
+        vertical-align: middle;
+    }
+
+    .data-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .data-table tr:hover td {
+        background-color: #f8fafc;
+    }
+
+    .prop-title {
+        font-weight: 500;
+        color: #0f172a;
+    }
+
+    .buyer-name {
+        font-weight: 500;
+        color: #2563eb;
+    }
+    
+    .price {
+        font-weight: 500;
+        color: #16a34a;
+    }
+
+    .badge-status {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        line-height: 1;
+    }
+
+    .badge-pending { background: #fef3c7; color: #b45309; }
+    .badge-completed { background: #dcfce7; color: #166534; }
+    .badge-stage { background: #e0f2fe; color: #0369a1; }
+
+    /* Flat Button */
+    .btn-action {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        color: #0f172a;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-action:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #0f172a;
+    }
+    
+    /* Search & Filter */
+    .search-input {
+        padding: 8px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        font-size: 0.875rem;
+        outline: none;
+        min-width: 250px;
+        color: var(--text-main);
+    }
+
+    .search-input:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+    }
+
+    .filter-btn {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+        padding: 6px 16px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .filter-btn:hover {
+        background: #f8fafc;
+        color: var(--text-main);
+    }
+
+    .filter-btn.active {
+        background: #f1f5f9;
+        color: var(--text-main);
+        border-color: #cbd5e1;
+    }
+
+    .progress-wrapper {
+        width: 120px;
+        height: 6px;
+        background: #f1f5f9;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: #2563eb;
+        border-radius: 4px;
+    }
+
+    /* Mobile Card Styles */
+    .deal-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+</style>
+
+<div class="container-fluid p-0">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Deal Management</h1>
+            <p class="page-subtitle">Track and manage property transactions.</p>
+        </div>
+        <div class="d-flex gap-3 flex-wrap">
+            <input type="text" id="searchBox" class="search-input" placeholder="Search property / buyer..." />
+            <div class="d-flex gap-2">
+                <button class="filter-btn active" data-status="All">All</button>
+                <button class="filter-btn" data-status="Completed">Completed</button>
+                <button class="filter-btn" data-status="Pending">Pending</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABLE FOR DESKTOP -->
+    <div class="section-card d-none d-md-block">
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Property</th>
+                        <th>Buyer / Tenant</th>
+                        <th>Price</th>
+                        <th>Stage</th>
+                        <th>Progress</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    @{ int count = 1; }
+                    @foreach (var item in Model)
+                    {
+                        if (item == null) continue;
+
+                        double totalStages = string.Equals(item.PropertyType, "Rent", StringComparison.OrdinalIgnoreCase) ? 6.0 : 7.0;
+                        double progress = ((double)(item.Stage ?? 0) / totalStages) * 100;
+                        bool isCompleted = string.Equals(item.Status, "Completed", StringComparison.OrdinalIgnoreCase);
+
+                        <tr data-status="@(item.Status ?? "Pending")">
+                            <td>@count</td>
+                            <td><span class="prop-title">@item.PropertyTitle</span></td>
+                            <td><span class="buyer-name">@item.Buyer</span></td>
+                            <td><span class="price">₹ @item.Price.ToString("N0")</span></td>
+                            <td><span class="badge-status badge-stage">Stage @item.Stage</span></td>
+                            <td>
+                                <div class="progress-wrapper">
+                                    <div class="progress-fill" style="width: @progress%;"></div>
+                                </div>
+                            </td>
+                            <td>
+                                @if (isCompleted)
+                                {
+                                    <span class="badge-status badge-completed">Completed</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-status badge-pending">Pending</span>
+                                }
+                            </td>
+                            <td>
+                                <a href="/Admin/ProcessDeal/@item.EnquiryId" class="btn-action">
+                                    Continue <i class="fa-solid fa-arrow-right" style="font-size: 0.75rem;"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        count++;
+                    }
+                </tbody>
+            </table>
+            @if(!Model.Any())
+            {
+                <div class="text-center py-5 text-muted" style="font-size: 0.875rem;">
+                    <p class="m-0">No deals found.</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- MOBILE CARDS -->
+    <div class="d-md-none" id="cardContainer">
+        @foreach (var item in Model)
+        {
+            if (item == null) continue;
+
+            double totalStages = string.Equals(item.PropertyType, "Rent", StringComparison.OrdinalIgnoreCase) ? 6.0 : 7.0;
+            double progress = ((double)(item.Stage ?? 0) / totalStages) * 100;
+            bool isCompleted = string.Equals(item.Status, "Completed", StringComparison.OrdinalIgnoreCase);
+
+            <div class="deal-card" data-status="@(item.Status ?? "Pending")">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div class="prop-title">@item.PropertyTitle</div>
+                    @if (isCompleted)
+                    {
+                        <span class="badge-status badge-completed">Completed</span>
+                    }
+                    else
+                    {
+                        <span class="badge-status badge-pending">Pending</span>
+                    }
+                </div>
+                <div class="text-muted" style="font-size: 0.875rem; margin-bottom: 4px;">@(string.Equals(item.PropertyType, "Rent", StringComparison.OrdinalIgnoreCase) ? "Tenant" : "Buyer"): <span class="buyer-name">@item.Buyer</span></div>
+                <div class="price mb-3">₹ @item.Price.ToString("N0")</div>
+                
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <span class="badge-status badge-stage">Stage @item.Stage</span>
+                    <div class="progress-wrapper flex-grow-1">
+                        <div class="progress-fill" style="width: @progress%;"></div>
+                    </div>
+                </div>
+
+                <a href="/Admin/ProcessDeal/@item.EnquiryId" class="btn-action w-100 justify-content-center">
+                    Continue
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const searchBox = document.getElementById("searchBox");
+        const rows = document.querySelectorAll("#tableBody tr");
+        const cards = document.querySelectorAll(".deal-card");
+        const filterButtons = document.querySelectorAll(".filter-btn");
+
+        // SEARCH
+        searchBox.addEventListener("keyup", function () {
+            let value = this.value.toLowerCase();
+            rows.forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(value) ? "" : "none";
+            });
+            cards.forEach(card => {
+                card.style.display = card.innerText.toLowerCase().includes(value) ? "" : "none";
+            });
+        });
+
+        // FILTER
+        filterButtons.forEach(btn => {
+            btn.addEventListener("click", function () {
+                // Update active state
+                filterButtons.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                let status = this.getAttribute("data-status");
+
+                rows.forEach(row => {
+                    row.style.display = (status === "All" || row.dataset.status === status) ? "" : "none";
+                });
+                cards.forEach(card => {
+                    card.style.display = (status === "All" || card.dataset.status === status) ? "" : "none";
+                });
+            });
+        });
+    });
+</script>

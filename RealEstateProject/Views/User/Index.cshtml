@@ -1,0 +1,1893 @@
+@model IEnumerable<RealEstateProject.Models.Property>
+
+@{
+    ViewData["Title"] = "Home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+<style>
+
+    :root {
+        --primary: #2563eb;
+        --dark: #0f172a;
+        --gray: #64748b;
+        --light: #f8fafc;
+        --border: #e2e8f0;
+    }
+
+    body {
+        background: #f8fafc;
+        overflow-x: hidden;
+    }
+
+    /* HERO */
+
+    .business-hero {
+        position: relative;
+        min-height: 92vh;
+        background: linear-gradient(rgba(15,23,42,.72), rgba(15,23,42,.82)), url('/images/banner/img-w-text1.jpg');
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: center;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+    }
+
+    .hero-badge {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 50px;
+        background: rgba(255,255,255,.1);
+        border: 1px solid rgba(255,255,255,.15);
+        color: white;
+        font-size: .85rem;
+        margin-bottom: 25px;
+        backdrop-filter: blur(10px);
+    }
+
+    .hero-title {
+        font-size: 4rem;
+        font-weight: 800;
+        color: white;
+        line-height: 1.1;
+        margin-bottom: 20px;
+    }
+
+    .hero-desc {
+        font-size: 1.1rem;
+        color: rgba(255,255,255,.85);
+        max-width: 750px;
+        margin: auto auto 40px;
+    }
+
+    /* SEARCH */
+
+    .business-search {
+        background: white;
+        padding: 18px;
+        border-radius: 20px;
+        box-shadow: 0 30px 60px rgba(0,0,0,.15);
+        max-width: 1200px;
+        margin: auto;
+    }
+
+    .search-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr 1fr 1fr 160px;
+        gap: 15px;
+    }
+
+    .search-box {
+        height: 64px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        padding: 0 18px;
+        background: white;
+    }
+
+        .search-box i {
+            color: var(--primary);
+            margin-right: 12px;
+        }
+
+        .search-box input,
+        .search-box select {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: .95rem;
+        }
+
+    .search-btn {
+        border: none;
+        background: var(--primary);
+        color: white;
+        border-radius: 14px;
+        font-weight: 700;
+        transition: .3s;
+    }
+
+        .search-btn:hover {
+            background: #1d4ed8;
+        }
+
+    /* STATS */
+
+    .stats-section {
+        margin-top: -60px;
+        position: relative;
+        z-index: 10;
+    }
+
+    .stats-wrapper {
+        background: white;
+        border-radius: 24px;
+        padding: 35px;
+        box-shadow: 0 20px 40px rgba(0,0,0,.08);
+    }
+
+    .stats-box h2 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--dark);
+        margin-bottom: 8px;
+    }
+
+    .stats-box p {
+        color: var(--gray);
+        margin: 0;
+    }
+
+    /* SECTION */
+
+    .section-padding {
+        padding: 90px 0;
+    }
+
+    .section-subtitle {
+        color: var(--primary);
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: .08em;
+        margin-bottom: 10px;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--dark);
+        margin-bottom: 15px;
+    }
+
+    .section-desc {
+        color: var(--gray);
+        max-width: 700px;
+        margin: auto;
+    }
+
+    /* PROPERTY CARD */
+
+    .property-card {
+        background: white;
+        border-radius: 22px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        transition: .3s;
+        height: 100%;
+    }
+
+        .property-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 60px rgba(0,0,0,.08);
+        }
+
+    .property-image {
+        position: relative;
+    }
+
+        .property-image img {
+            width: 100%;
+            height: 260px;
+            object-fit: cover;
+        }
+
+    .property-badge {
+        position: absolute;
+        top: 18px;
+        left: 18px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .badge-item {
+        background: white;
+        padding: 7px 14px;
+        border-radius: 50px;
+        font-size: .75rem;
+        font-weight: 700;
+    }
+
+    .badge-sale {
+        background: #2563eb;
+        color: white;
+    }
+
+    .badge-sold {
+        background: #dc2626;
+        color: white;
+    }
+
+    .property-location {
+        position: absolute;
+        bottom: 16px;
+        left: 18px;
+        color: white;
+        font-size: .9rem;
+        background: rgba(0,0,0,.5);
+        padding: 8px 14px;
+        border-radius: 50px;
+        backdrop-filter: blur(6px);
+    }
+
+    .property-content {
+        padding: 22px;
+    }
+
+    .property-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+    }
+
+        .property-title a {
+            color: var(--dark);
+            text-decoration: none;
+        }
+
+    .property-meta {
+        display: flex;
+        gap: 18px;
+        margin-bottom: 20px;
+        color: var(--gray);
+        font-size: .9rem;
+    }
+
+    .property-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid var(--border);
+        padding-top: 18px;
+    }
+
+    .owner-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .owner-box img {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+    .property-price {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--primary);
+    }
+
+    /* SERVICES */
+
+    .service-card {
+        background: white;
+        border-radius: 22px;
+        padding: 40px 30px;
+        border: 1px solid var(--border);
+        transition: .3s;
+        height: 100%;
+    }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0,0,0,.08);
+        }
+
+    .service-icon {
+        width: 75px;
+        height: 75px;
+        border-radius: 20px;
+        background: #eff6ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 25px;
+    }
+
+        .service-icon i {
+            font-size: 30px;
+            color: var(--primary);
+        }
+
+    .service-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        color: var(--dark);
+    }
+
+    .service-desc {
+        color: var(--gray);
+        line-height: 1.7;
+    }
+
+    /* WHY US */
+
+    .why-section {
+        background: white;
+        border-radius: 30px;
+        overflow: hidden;
+        box-shadow: 0 25px 60px rgba(0,0,0,.06);
+    }
+
+    .why-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .why-content {
+        padding: 60px;
+    }
+
+    .benefit-item {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .benefit-icon {
+        min-width: 60px;
+        height: 60px;
+        border-radius: 18px;
+        background: #eff6ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .benefit-icon i {
+            color: var(--primary);
+            font-size: 22px;
+        }
+
+    .benefit-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: var(--dark);
+    }
+
+    .benefit-desc {
+        color: var(--gray);
+        line-height: 1.7;
+    }
+
+    /* RESPONSIVE */
+
+    @@media(max-width:991px) {
+
+        .hero-title {
+            font-size: 2.5rem;
+        }
+
+        .search-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .stats-wrapper {
+            padding: 25px;
+        }
+
+        .why-content {
+            padding: 35px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+        }
+    }
+
+    /* ================= PROPERTY CARD ================= */
+
+    .property-card {
+        background: white;
+        border-radius: 28px;
+        overflow: hidden;
+        transition: .35s;
+        position: relative;
+        border: 1px solid #edf2f7;
+        box-shadow: 0 8px 30px rgba(15,23,42,.05);
+    }
+
+        .property-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(15,23,42,.12);
+        }
+
+    /* IMAGE */
+
+    .property-image-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .property-image {
+        width: 500px;
+        height: 250px;
+        object-fit: cover;
+        transition: 0.6s;
+    }
+
+    .property-card:hover .property-image {
+        transform: scale(1.08);
+    }
+
+    /* OVERLAY */
+
+    .image-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,.65), rgba(0,0,0,.05));
+    }
+
+    /* TOP TAG */
+
+    .property-badge {
+        position: absolute;
+        top: 18px;
+        left: 18px;
+        z-index: 3;
+        padding: 10px 18px;
+        border-radius: 50px;
+        font-size: 13px;
+        font-weight: 700;
+        backdrop-filter: blur(10px);
+    }
+
+    .badge-sale {
+        background: rgba(37,99,235,.95);
+        color: white;
+    }
+
+    .badge-sold {
+        background: rgba(239,68,68,.95);
+        color: white;
+    }
+
+    /* FAVORITE */
+
+    .favorite-btn {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: rgba(255,255,255,.18);
+        backdrop-filter: blur(12px);
+        color: white;
+        border: none;
+        z-index: 3;
+        transition: .3s;
+    }
+
+        .favorite-btn:hover {
+            background: white;
+            color: #ef4444;
+        }
+
+    /* LOCATION */
+
+    .property-location {
+        position: absolute;
+        bottom: 18px;
+        left: 18px;
+        z-index: 3;
+        color: white;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    /* CONTENT */
+
+    .property-content {
+        padding: 26px;
+    }
+
+    .property-title {
+        font-size: 24px;
+        font-weight: 800;
+        margin-bottom: 12px;
+        color: #0f172a;
+        line-height: 1.3;
+    }
+
+        .property-title a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+            .property-title a:hover {
+                color: #2563eb;
+            }
+
+    /* FEATURES */
+
+    .property-features {
+        display: flex;
+        gap: 14px;
+        margin-top: 20px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #f8fafc;
+        padding: 10px 14px;
+        border-radius: 14px;
+        font-size: 14px;
+        color: #334155;
+        font-weight: 600;
+    }
+
+        .feature-item i {
+            color: #2563eb;
+        }
+
+    /* BOTTOM */
+
+    .property-footer {
+        border-top: 1px solid #edf2f7;
+        padding-top: 22px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .agent-box {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .agent-img {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #eff6ff;
+    }
+
+    .agent-name {
+        font-size: 14px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .agent-role {
+        font-size: 12px;
+        color: #64748b;
+    }
+
+    .property-price {
+        text-align: right;
+    }
+
+        .property-price h4 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 800;
+            color: #2563eb;
+        }
+
+        .property-price span {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+</style>
+
+<!-- HERO -->
+
+<section class="business-hero">
+
+    <div class="container">
+
+        <div class="hero-content">
+
+            <span class="hero-badge">
+                India's Trusted Real Estate Platform
+            </span>
+
+            <h1 class="hero-title">
+                Find Premium Properties <br />
+                Across India
+            </h1>
+
+            <p class="hero-desc">
+                Buy, sell and rent verified residential & commercial properties
+                with confidence and transparency.
+            </p>
+
+            <!-- SEARCH -->
+
+            <div class="business-search">
+
+                <form method="GET" asp-controller="User" asp-action="Properties">
+
+                    <div class="search-grid">
+
+                        <div class="search-box">
+                            <i class="fa-solid fa-location-dot"></i>
+
+                            <input type="text"
+                                   name="searchQuery"
+                                   placeholder="Search by city, area or locality..." />
+                        </div>
+
+                        <div class="search-box">
+
+                            <i class="fa-solid fa-building"></i>
+
+                            <select name="propertyType">
+                                <option value="">Property Type</option>
+                                @if (ViewBag.PropertyTypes != null)
+                                {
+                                    foreach (var type in ViewBag.PropertyTypes as List<string>)
+                                    {
+                                        <option value="@type">@type</option>
+                                    }
+                                }
+                            </select>
+
+                        </div>
+
+                        <div class="search-box">
+
+                            <i class="fa-solid fa-indian-rupee-sign"></i>
+
+                            <input type="number"
+                                   name="minPrice"
+                                   placeholder="Min Price (₹)"
+                                   style="width: 100%; border: none; outline: none; background: transparent; font-size: .95rem;" />
+
+                        </div>
+
+                        <div class="search-box">
+
+                            <i class="fa-solid fa-indian-rupee-sign"></i>
+
+                            <input type="number"
+                                   name="maxPrice"
+                                   placeholder="Max Price (₹)"
+                                   style="width: 100%; border: none; outline: none; background: transparent; font-size: .95rem;" />
+
+                        </div>
+
+                        <button type="submit" class="search-btn">
+
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- STATS -->
+
+<section class="stats-section">
+
+    <div class="container">
+
+        <div class="stats-wrapper">
+
+            <div class="row text-center">
+
+                <div class="col-md-3 col-6 mb-4 mb-md-0">
+
+                    <div class="stats-box">
+                        <h2>12K+</h2>
+                        <p>Properties Listed</p>
+                    </div>
+
+                </div>
+
+                <div class="col-md-3 col-6">
+
+                    <div class="stats-box">
+                        <h2>8K+</h2>
+                        <p>Happy Clients</p>
+                    </div>
+
+                </div>
+
+                <div class="col-md-3 col-6 mt-4 mt-md-0">
+
+                    <div class="stats-box">
+                        <h2>150+</h2>
+                        <p>Cities Covered</p>
+                    </div>
+
+                </div>
+
+                <div class="col-md-3 col-6 mt-4 mt-md-0">
+
+                    <div class="stats-box">
+                        <h2>24/7</h2>
+                        <p>Customer Support</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- PROPERTIES -->
+<section class="flat-section flat-recommended">
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="box-title text-center wow fadeInUp">
+            <div class="text-subtitle text-primary">Featured Properties</div>
+            <h3 class="mt-4 title">Recommended For You</h3>
+        </div>
+
+        <!-- CARDS -->
+        <div class="row">
+
+            @if (Model == null || !Model.Any())
+            {
+                <h4 class="text-danger text-center">No Properties Found</h4>
+            }
+            else
+                           @foreach (var item in Model.Take(6))
+                {
+                    var image = item.ProperyImages?.FirstOrDefault()?.ImagePath;
+
+                    if (string.IsNullOrEmpty(image))
+                    {
+                        image = "/images/default.jpg";
+                    }
+
+                    <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+                        <div class="property-card">
+
+                            <!-- IMAGE -->
+                            <div class="property-image-wrapper">
+
+                                <a asp-controller="User"
+                                   asp-action="ViewProperty"
+                                   asp-route-id="@item.ProperyId">
+
+                                    <img src="@Url.Content(image)"
+                                         class="property-image" />
+
+                                    <div class="image-overlay"></div>
+
+                                </a>
+
+                                <!-- BADGE -->
+                                @if (item.Status == "Sold")
+                                {
+                                    <div class="property-badge badge-sold">
+                                        Sold
+                                    </div>
+                                }
+                                else if (item.PropertyType == "Sell")
+                                {
+                                    <div class="property-badge badge-sale">
+                                        For Sale
+                                    </div>
+                                }
+                                else if (item.PropertyType == "Rent")
+                                {
+                                    <div class="property-badge badge-sale">
+                                        For Rent
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div>
+                                        No found
+                                    </div>
+
+
+
+                                }
+
+
+                                <!-- FAVORITE -->
+                                @{
+                                    var favList = ViewBag.FavoritePropertyIds as List<int>;
+                                    var isFavorite = favList != null && favList.Contains(item.ProperyId);
+                                }
+                                <button class="favorite-btn" onclick="toggleFavorite(this, @item.ProperyId); return false;">
+                                    <i class="@(isFavorite ? "fa-solid text-danger" : "fa-regular") fa-heart"></i>
+                                </button>
+
+                                <!-- LOCATION -->
+                                <div class="property-location">
+                                    <i class="fa-solid fa-location-dot me-1"></i>
+                                    @item.Address
+                                </div>
+
+                            </div>
+
+                            <!-- CONTENT -->
+                            <div class="property-content">
+
+                                <h3 class="property-title">
+
+                                    <a asp-controller="User"
+                                       asp-action="ViewProperty"
+                                       asp-route-id="@item.ProperyId">
+
+                                        @item.Title
+
+                                    </a>
+
+                                </h3>
+
+                                <!-- FEATURES -->
+                                <div class="property-features">
+
+                                    <div class="feature-item">
+                                        <i class="fa-solid fa-bed"></i>
+                                        @item.Bedroom Beds
+                                    </div>
+
+                                    <div class="feature-item">
+                                        <i class="fa-solid fa-bath"></i>
+                                        @item.Bathrooms Baths
+                                    </div>
+
+                                    <div class="feature-item">
+                                        <i class="fa-solid fa-ruler-combined"></i>
+                                        @item.AreaSqft Sqft
+                                    </div>
+
+                                </div>
+
+                                <!-- FOOTER -->
+                                <div class="property-footer">
+
+                                    <!-- AGENT -->
+                                    <div class="agent-box">
+
+                                        <img src="@(string.IsNullOrEmpty(item.User?.ProfileImage)
+                                                                                     ? Url.Content("~/images/profile/default.png")
+                                                                                     : Url.Content(item.User.ProfileImage))"
+                                             class="agent-img" />
+
+                                        <div>
+                                            <div class="agent-name">
+                                                @item.User?.FullName
+                                            </div>
+
+                                            <div class="agent-role">
+                                                Property Agent
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <!-- PRICE -->
+                                    <div class="property-price">
+
+                                        <h4>
+                                            ₹ @item.Price
+                                        </h4>
+
+                                        <span>Starting Price</span>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                }     
+            
+
+        </div>
+    </div>
+</section>
+
+
+<!-- SERVICES -->
+
+<section class="section-padding pt-0">
+
+    <div class="container">
+
+        <div class="text-center mb-5">
+
+            <div class="section-subtitle">
+                Our Services
+            </div>
+
+            <h2 class="section-title">
+                Complete Real Estate Solutions
+            </h2>
+
+        </div>
+
+        <div class="row">
+
+            <div class="col-lg-4 mb-4">
+
+                <div class="service-card">
+
+                    <div class="service-icon">
+                        <i class="fa-solid fa-house"></i>
+                    </div>
+
+                    <h4 class="service-title">
+                        Buy Property
+                    </h4>
+
+                    <p class="service-desc">
+                        Discover verified homes, apartments and investment
+                        opportunities with transparent pricing.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-4 mb-4">
+
+                <div class="service-card">
+
+                    <div class="service-icon">
+                        <i class="fa-solid fa-key"></i>
+                    </div>
+
+                    <h4 class="service-title">
+                        Rent Property
+                    </h4>
+
+                    <p class="service-desc">
+                        Find rental properties that match your lifestyle
+                        and budget across top locations.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-4 mb-4">
+
+                <div class="service-card">
+
+                    <div class="service-icon">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+
+                    <h4 class="service-title">
+                        Sell Property
+                    </h4>
+
+                    <p class="service-desc">
+                        Sell faster with professional listings,
+                        verified buyers and smart market insights.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- WHY CHOOSE US -->
+
+<section class="section-padding pt-0">
+
+    <div class="container">
+
+        <div class="why-section">
+
+            <div class="row g-0 align-items-center">
+
+                <div class="col-lg-6">
+
+                    <div class="why-image">
+
+                        <img src="@Url.Content("~/images/banner/img-w-text1.jpg")" />
+
+                    </div>
+
+                </div>
+
+                <div class="col-lg-6">
+
+                    <div class="why-content">
+
+                        <div class="section-subtitle">
+                            Why Choose Us
+                        </div>
+
+                        <h2 class="section-title">
+                            Trusted By Thousands
+                        </h2>
+
+                        <div class="benefit-item">
+
+                            <div class="benefit-icon">
+                                <i class="fa-solid fa-shield"></i>
+                            </div>
+
+                            <div>
+
+                                <div class="benefit-title">
+                                    Verified Properties
+                                </div>
+
+                                <div class="benefit-desc">
+                                    Every listing is verified to ensure
+                                    transparency and trust.
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="benefit-item">
+
+                            <div class="benefit-icon">
+                                <i class="fa-solid fa-user-tie"></i>
+                            </div>
+
+                            <div>
+
+                                <div class="benefit-title">
+                                    Expert Guidance
+                                </div>
+
+                                <div class="benefit-desc">
+                                    Professional support throughout your
+                                    buying and selling journey.
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="benefit-item mb-0">
+
+                            <div class="benefit-icon">
+                                <i class="fa-solid fa-headset"></i>
+                            </div>
+
+                            <div>
+
+                                <div class="benefit-title">
+                                    24/7 Support
+                                </div>
+
+                                <div class="benefit-desc">
+                                    Dedicated support team ready to assist
+                                    you anytime.
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+@* @model IEnumerable<RealEstateProject.Models.Property>
+
+@{
+    ViewData["Title"] = "Home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+<!-- HERO SECTION -->
+<section class="flat-slider home-1">
+    <div class="container relative">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="slider-content">
+                    <div class="heading text-center">
+                        <h1 class="title-large text-white animationtext slide">
+                            Find Your
+                            <span class="tf-text s1 cd-words-wrapper">
+                                <span class="item-text is-visible">Dream Home</span>
+                                <span class="item-text is-hidden">Perfect Home</span>
+                            </span>
+                        </h1>
+                        <p class="subtitle text-white body-2 wow fadeInUp" data-wow-delay=".2s">
+                            We are a
+                            real estate agency that will help you find the best residence you dream of,
+                            let’s discuss for your dream house?
+                        </p>
+                    </div>
+                    <div class="flat-tab flat-tab-form">
+                        <ul class="nav-tab-form style-1 justify-content-center" role="tablist">
+                            <li class="nav-tab-item" role="presentation">
+                                <a href="#forRent" class="nav-link-item active" data-bs-toggle="tab">
+                                    For
+                                    Rent
+                                </a>
+                            </li>
+                            <li class="nav-tab-item" role="presentation">
+                                <a href="#forSale" class="nav-link-item" data-bs-toggle="tab">For Sale</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane fade active show" role="tabpanel">
+                                <div class="form-sl">
+                                    <form method="post">
+                                        <div class="wd-find-select">
+                                            <div class="inner-group">
+                                                <div class="form-group-1 search-form form-style">
+                                                    <label>Type</label>
+                                                    <div class="group-select">
+                                                        <div class="nice-select" tabindex="0">
+                                                            <span class="current">All</span>
+                                                            <ul class="list">
+                                                                <li data-value class="option selected">
+                                                                    All
+                                                                </li>
+                                                                <li data-value="villa" class="option">
+                                                                    Villa
+                                                                </li>
+                                                                <li data-value="studio" class="option">
+                                                                    Studio
+                                                                </li>
+                                                                <li data-value="office" class="option">
+                                                                    Office
+                                                                </li>
+                                                                <li data-value="house" class="option">
+                                                                    House
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="form-group-2 form-style">
+                                                    <label>Location</label>
+                                                    <div class="group-ip">
+                                                        <input type="text" class="form-control"
+                                                               placeholder="Search Location" value="" name="s"
+                                                               title="Search for" required="">
+                                                        <a href="#" class="icon icon-location">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group-3 form-style">
+                                                    <label>Keyword</label>
+                                                    <input type="text" class="form-control"
+                                                           placeholder="Search Keyword." value="" name="s"
+                                                           title="Search for" required="">
+                                                </div>
+
+                                            </div>
+                                            <div class="box-btn-advanced">
+                                                <div class="form-group-4 box-filter">
+                                                    <a class="tf-btn btn-line filter-advanced pull-right">
+                                                        <span class="text-1">Search advanced</span>
+                                                        <svg width="22" height="22" viewBox="0 0 22 22"
+                                                             fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M5.5 12.375V3.4375M5.5 12.375C5.86467 12.375 6.21441 12.5199 6.47227 12.7777C6.73013 13.0356 6.875 13.3853 6.875 13.75C6.875 14.1147 6.73013 14.4644 6.47227 14.7223C6.21441 14.9801 5.86467 15.125 5.5 15.125M5.5 12.375C5.13533 12.375 4.78559 12.5199 4.52773 12.7777C4.26987 13.0356 4.125 13.3853 4.125 13.75C4.125 14.1147 4.26987 14.4644 4.52773 14.7223C4.78559 14.9801 5.13533 15.125 5.5 15.125M5.5 15.125V18.5625M16.5 12.375V3.4375M16.5 12.375C16.8647 12.375 17.2144 12.5199 17.4723 12.7777C17.7301 13.0356 17.875 13.3853 17.875 13.75C17.875 14.1147 17.7301 14.4644 17.4723 14.7223C17.2144 14.9801 16.8647 15.125 16.5 15.125M16.5 12.375C16.1353 12.375 15.7856 12.5199 15.5277 12.7777C15.2699 13.0356 15.125 13.3853 15.125 13.75C15.125 14.1147 15.2699 14.4644 15.5277 14.7223C15.7856 14.9801 16.1353 15.125 16.5 15.125M16.5 15.125V18.5625M11 6.875V3.4375M11 6.875C11.3647 6.875 11.7144 7.01987 11.9723 7.27773C12.2301 7.53559 12.375 7.88533 12.375 8.25C12.375 8.61467 12.2301 8.96441 11.9723 9.22227C11.7144 9.48013 11.3647 9.625 11 9.625M11 6.875C10.6353 6.875 10.2856 7.01987 10.0277 7.27773C9.76987 7.53559 9.625 7.88533 9.625 8.25C9.625 8.61467 9.76987 8.96441 10.0277 9.22227C10.2856 9.48013 10.6353 9.625 11 9.625M11 9.625V18.5625"
+                                                                  stroke="#161E2D" stroke-width="1.5"
+                                                                  stroke-linecap="round"
+                                                                  stroke-linejoin="round" />
+                                                        </svg>
+                                                    </a>
+                                                </div>
+                                                <button type="submit"
+                                                        class="tf-btn btn-search primary">
+                                                    Search <i class="icon icon-search"></i>
+                                                </button>
+                                            </div>
+
+                                        </div>
+                                        <div class="wd-search-form">
+                                            <div class="grid-2 group-box group-price">
+                                                <div class="widget-price">
+                                                    <div class="box-title-price">
+                                                        <span class="title-price fw-6">Price:</span>
+                                                        <div class="caption-price">
+                                                            <span id="slider-range-value1"
+                                                                  class="fw-6"></span>
+                                                            <span>-</span>
+                                                            <span id="slider-range-value2"
+                                                                  class="fw-6"></span>
+                                                        </div>
+                                                    </div>
+                                                    <div id="slider-range"></div>
+                                                    <div class="slider-labels">
+                                                        <div>
+                                                            <input type="hidden" name="min-value" value="">
+                                                            <input type="hidden" name="max-value" value="">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="widget-price">
+                                                    <div class="box-title-price">
+                                                        <span class="title-price fw-6">Size:</span>
+                                                        <div class="caption-price">
+                                                            <span id="slider-range-value01"
+                                                                  class="fw-7"></span>
+                                                            <span>-</span>
+                                                            <span id="slider-range-value02"
+                                                                  class="fw-7"></span>
+                                                        </div>
+                                                    </div>
+                                                    <div id="slider-range2"></div>
+                                                    <div class="slider-labels">
+                                                        <div>
+                                                            <input type="hidden" name="min-value2" value="">
+                                                            <input type="hidden" name="max-value2" value="">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="grid-2 group-box">
+                                                <div class="group-select grid-2">
+                                                    <div class="box-select">
+                                                        <label class="title-select fw-6">Rooms</label>
+                                                        <div class="nice-select" tabindex="0">
+                                                            <span class="current">2</span>
+                                                            <ul class="list">
+                                                                <li data-value="1" class="option">1</li>
+                                                                <li data-value="2" class="option selected">
+                                                                    2
+                                                                </li>
+                                                                <li data-value="3" class="option">3</li>
+                                                                <li data-value="4" class="option">4</li>
+                                                                <li data-value="5" class="option">5</li>
+                                                                <li data-value="6" class="option">6</li>
+                                                                <li data-value="7" class="option">7</li>
+                                                                <li data-value="8" class="option">8</li>
+                                                                <li data-value="9" class="option">9</li>
+                                                                <li data-value="10" class="option">10</li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                    <div class="box-select">
+                                                        <label class="title-select fw-6">Bathrooms</label>
+                                                        <div class="nice-select" tabindex="0">
+                                                            <span class="current">2</span>
+                                                            <ul class="list">
+                                                                <li data-value="1" class="option">1</li>
+                                                                <li data-value="2" class="option selected">
+                                                                    2
+                                                                </li>
+                                                                <li data-value="3" class="option">3</li>
+                                                                <li data-value="4" class="option">4</li>
+                                                                <li data-value="5" class="option">5</li>
+                                                                <li data-value="6" class="option">6</li>
+                                                                <li data-value="7" class="option">7</li>
+                                                                <li data-value="8" class="option">8</li>
+                                                                <li data-value="9" class="option">9</li>
+                                                                <li data-value="10" class="option">10</li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="group-select grid-2">
+                                                    <div class="box-select">
+                                                        <label class="title-select fw-6">Bedrooms</label>
+                                                        <div class="nice-select" tabindex="0">
+                                                            <span class="current">2</span>
+                                                            <ul class="list">
+                                                                <li data-value="1" class="option">1</li>
+                                                                <li data-value="2" class="option selected">
+                                                                    2
+                                                                </li>
+                                                                <li data-value="3" class="option">3</li>
+                                                                <li data-value="4" class="option">4</li>
+                                                                <li data-value="5" class="option">5</li>
+                                                                <li data-value="6" class="option">6</li>
+                                                                <li data-value="7" class="option">7</li>
+                                                                <li data-value="8" class="option">8</li>
+                                                                <li data-value="9" class="option">9</li>
+                                                                <li data-value="10" class="option">10</li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                    <div class="box-select">
+                                                        <label class="title-select fw-6">Type</label>
+                                                        <div class="nice-select" tabindex="0">
+                                                            <span class="current">2</span>
+                                                            <ul class="list">
+                                                                <li data-value="1" class="option">1</li>
+                                                                <li data-value="2" class="option selected">
+                                                                    2
+                                                                </li>
+                                                                <li data-value="3" class="option">3</li>
+                                                                <li data-value="4" class="option">4</li>
+                                                                <li data-value="5" class="option">5</li>
+                                                                <li data-value="6" class="option">6</li>
+                                                                <li data-value="7" class="option">7</li>
+                                                                <li data-value="8" class="option">8</li>
+                                                                <li data-value="9" class="option">9</li>
+                                                                <li data-value="10" class="option">10</li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="group-checkbox">
+                                                <div class="text-1 text-black-2">Amenities:</div>
+                                                <div class="group-amenities grid-6">
+                                                    <div class="box-amenities">
+                                                        <fieldset class="amenities-item">
+                                                            <input type="checkbox"
+                                                                   class="tf-checkbox style-1" id="cb1"
+                                                                   checked>
+                                                            <label for="cb1" class="text-cb-amenities">
+                                                                Air
+                                                                Condition
+                                                            </label>
+                                                        </fieldset>
+                                                        <fieldset class="amenities-item mt-16">
+                                                            <input type="checkbox"
+                                                                   class="tf-checkbox style-1" id="cb2">
+                                                            <label for="cb2" class="text-cb-amenities">
+                                                                Cable
+                                                                TV
+                                                            </label>
+                                                        </fieldset>
+                                                        <fieldset class="amenities-item mt-16">
+                                                            <input type="checkbox"
+                                                                   class="tf-checkbox style-1" id="cb3">
+                                                            <label for="cb3"
+                                                                   class="text-cb-amenities">
+                                                                Ceiling
+                                                                Height
+                                                            </label>
+                                                        </fieldset>
+                                                        <fieldset class="amenities-item mt-16">
+                                                            <input type="checkbox"
+                                                                   class="tf-checkbox style-1" id="cb4">
+                                                            <label for="cb4"
+                                                                   class="text-cb-amenities">Fireplace</label>
+                                                        </fieldset>
+                                                    </div>
+                                                    <div class="box-amenities">
+                                                        <fieldset class="amenities-item">
+                                                            <input type="checkbox"
+                                                                   class="tf-checkbox style-1" id="cb5">
+                                                            <label for="cb5"
+                                                                   class="text-cb-amenities">
+                                                                Disabled
+                                                                Access
+                                                            </label>
+                                                        </fieldset>
+                                                        <fieldset class="amenities-item mt-16">
+                                                            <input type="checkbox"
+                                                                   class="tf-checkbox style-1" id="cb6"
+                                                                   checked>
+                                                            <label for="cb6"
+                                                                   class="text-cb-amenities">Elevator</label>
+                                                        </fieldset>
+                                                        <fieldset class="amenities-item mt-16">
+                                                            <input type="checkbox"
+                                                                   class="tf-checkbox style-1" id="cb7">
+                                                            <label for="cb7"
+                                                                   class="text-cb-amenities">Fence</label>
+                                                        </fieldset>
+                                                        <fieldset class="amenities-item mt-16">
+                                                            <input type="checkbox"
+                                                                   class="tf-checkbox style-1" id="cb8">
+                                                            <label for="cb8"
+                                                                   class="text-cb-amenities">Garden</label>
+                                                        </fieldset>
+                                                    </div>
+                                                    <div class="box-amenities">
+                                                        <fieldset class="amenities-item">
+                                                            <input type="checkbox"
+                                                                   class="tf-checkbox style-1" id="cb9"
+                                                                   checked>
+                                                            <label for="cb9"
+                                                                   class="text-cb-amenities">Floor</label>
+                                                        </fieldset>
+                                                        <fieldset class="amenities-item mt-16">
+                                                            <input type="checkbox"
+                                                                   class="tf-checkbox style-1" id="cb10">
+                                                            <label for="cb10"
+                                                                   class="text-cb-amenities">Furnishing</label>
+                                                        </fieldset>
+                                                        <fieldset class="amenities-item mt-16">
+                                                            <input type="checkbox"
+                                                                   class="tf-checkbox style-1" id="cb11"
+                                                                   checked>
+                                                            <label for="cb11"
+                                                                   class="text-cb-amenities">Garage</label>
+                                                        </fieldset>
+                                                        <fieldset class="amenities-item mt-16">
+                                                            <input type="checkbox"
+                                                                   class="tf-checkbox style-1" id="cb12">
+                                                            <label for="cb12" class="text-cb-amenities">
+                                                                Pet
+                                                                Friendly
+                                                            </label>
+                                                        </fieldset>
+                                                    </div>
+                                                    <div class="box-amenities">
+                                                        <fieldset class="amenities-item">
+                                                            <input type="checkbox"
+                                                                   class="tf-checkbox style-1" id="cb13">
+                                                            <label for="cb13"
+                                                                   class="text-cb-amenities">Heating</label>
+                                                        </fieldset>
+                                                        <fieldset class="amenities-item mt-16">
+                                                            <input type="checkbox"
+                                                                   class="tf-checkbox style-1" id="cb14">
+                                                            <label for="cb14"
+                                                                   class="text-cb-amenities">Intercom</label>
+                                                        </fieldset>
+                                                        <fieldset class="amenities-item mt-16">
+                                                            <input type="checkbox"
+                                                                   class="tf-checkbox style-1" id="cb15">
+                                                            <label for="cb15"
+                                                                   class="text-cb-amenities">Parking</label>
+                                                        </fieldset>
+                                                        <fieldset class="amenities-item mt-16">
+                                                            <input type="checkbox"
+                                                                   class="tf-checkbox style-1" id="cb16">
+                                                            <label for="cb16"
+                                                                   class="text-cb-amenities">WiFi</label>
+                                                        </fieldset>
+                                                    </div>
+                                                    <div class="box-amenities">
+                                                        <fieldset class="amenities-item">
+                                                            <input type="checkbox"
+                                                                   class="tf-checkbox style-1" id="cb17">
+                                                            <label for="cb17"
+                                                                   class="text-cb-amenities">Renovation</label>
+                                                        </fieldset>
+                                                        <fieldset class="amenities-item mt-16">
+                                                            <input type="checkbox"
+                                                                   class="tf-checkbox style-1" id="cb18">
+                                                            <label for="cb18"
+                                                                   class="text-cb-amenities">Security</label>
+                                                        </fieldset>
+                                                        <fieldset class="amenities-item mt-16">
+                                                            <input type="checkbox"
+                                                                   class="tf-checkbox style-1" id="cb19">
+                                                            <label for="cb19"
+                                                                   class="text-cb-amenities">
+                                                                Swimming
+                                                                Pool
+                                                            </label>
+                                                        </fieldset>
+
+                                                    </div>
+                                                    <div class="box-amenities">
+                                                        <fieldset class="amenities-item">
+                                                            <input type="checkbox"
+                                                                   class="tf-checkbox style-1" id="cb20">
+                                                            <label for="cb20"
+                                                                   class="text-cb-amenities">
+                                                                Window
+                                                                Type
+                                                            </label>
+                                                        </fieldset>
+                                                        <fieldset class="amenities-item mt-16">
+                                                            <input type="checkbox"
+                                                                   class="tf-checkbox style-1" id="cb21">
+                                                            <label for="cb21"
+                                                                   class="text-cb-amenities">
+                                                                Search
+                                                                property
+                                                            </label>
+                                                        </fieldset>
+                                                        <fieldset class="amenities-item mt-16">
+                                                            <input type="checkbox"
+                                                                   class="tf-checkbox style-1" id="cb22">
+                                                            <label for="cb22"
+                                                                   class="text-cb-amenities">
+                                                                Construction
+                                                                Year
+                                                            </label>
+                                                        </fieldset>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="overlay"></div>
+</section>
+
+<!-- PROPERTIES -->
+<section class="flat-section flat-recommended">
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="box-title text-center wow fadeInUp">
+            <div class="text-subtitle text-primary">Featured Properties</div>
+            <h3 class="mt-4 title">Recommended For You</h3>
+        </div>
+
+        <!-- CARDS -->
+        <div class="row">
+
+            @if (Model == null || !Model.Any())
+            {
+                <h4 class="text-danger text-center">No Properties Found</h4>
+            }
+            else
+            {
+                @foreach (var item in Model.Take(6))
+                {
+                    var image = item.ProperyImages?.FirstOrDefault()?.ImagePath;
+
+                    if (string.IsNullOrEmpty(image))
+                    {
+                        image = "/images/default.jpg";
+                    }
+
+                    <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+                        <div class="homelengo-box">
+
+                            <!-- IMAGE -->
+                            <div class="archive-top">
+                                <a asp-controller="User"
+                                   asp-action="ViewProperty"
+                                   asp-route-id="@item.ProperyId"
+                                   class="images-group">
+
+                                    <div class="images-style">
+                                        <img src="@Url.Content(image)"
+                                             class="img-fluid"
+                                             style="height:250px; object-fit:cover;" />
+                                    </div>
+
+                                    <!-- TAG -->
+                                    <div class="top">
+                                        <ul class="d-flex gap-6">
+                                            <li class="flag-tag primary">Featured</li>
+
+                                            @if (item.Status == "Sold")
+                                            {
+                                                <li class="flag-tag style-1 bg-danger">Sold</li>
+                                            }
+                                            else
+                                            {
+                                                <li class="flag-tag style-1">For Sale</li>
+                                            }
+                                        </ul>
+                                    </div>
+
+                                    <!-- ADDRESS -->
+                                    <div class="bottom text-white">
+                                        <i class="fa fa-map-marker-alt me-1"></i>
+                                        @item.Address
+                                    </div>
+                                </a>
+                            </div>
+
+                            <!-- CONTENT -->
+                            <div class="archive-bottom">
+                                <div class="content-top">
+
+                                    <h6 class="text-capitalize">
+                                        <a asp-controller="User"
+                                           asp-action="ViewProperty"
+                                           asp-route-id="@item.ProperyId"
+                                           class="link">
+                                            @item.Title
+                                        </a>
+                                    </h6>
+
+                                    <ul class="meta-list">
+                                        <li class="item">
+                                            <i class="icon icon-bed"></i>
+                                            <span>Beds:</span>
+                                            <span class="fw-6">@item.Bedroom</span>
+                                        </li>
+
+                                        <li class="item">
+                                            <i class="icon icon-bath"></i>
+                                            <span>Baths:</span>
+                                            <span class="fw-6">@item.Bathrooms</span>
+                                        </li>
+
+                                        <li class="item">
+                                            <i class="icon icon-sqft"></i>
+                                            <span>Sqft:</span>
+                                            <span class="fw-6">@item.AreaSqft</span>
+                                        </li>
+                                    </ul>
+
+                                </div>
+
+                                <!-- PRICE -->
+                                <div class="content-bottom d-flex align-items-center justify-content-between">
+
+                                    <!-- LEFT: USER INFO -->
+                                    <div class="d-flex align-items-center gap-2">
+
+                                        <div class="avatar avt-40 round">
+                                            <img src="@(string.IsNullOrEmpty(item.User?.ProfileImage)
+                                                                         ? Url.Content("~/images/profile/default.png")
+                                                                         : Url.Content(item.User.ProfileImage))"
+                                         class="profile-img" />
+                                </div>
+
+                                        <span class="text-muted fw-500">
+                                            @item.User?.FullName
+                                        </span>
+
+                                    </div>
+
+                                    <!-- RIGHT: PRICE -->
+                                    <h6 class="price text-primary mb-0">
+                                        ₹ @item.Price
+                                    </h6>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                }
+            }
+
+        </div>
+    </div>
+</section>
+<section class="flat-section">
+    <div class="container">
+        <div class="box-title text-center wow fadeInUp">
+            <div class="text-subtitle text-primary">Our Services</div>
+            <h3 class="mt-4 title">What We Do?</h3>
+        </div>
+        <div class="tf-grid-layout md-col-3 wow fadeInUp" data-wow-delay=".2s">
+            <div class="box-service">
+                <div class="image">
+                    <img src="@Url.Content("~/images/service/home-1.png")" class="img-fluid" />
+                </div>
+                <div class="content">
+                    <h5 class="title">Buy A New Home</h5>
+                    <p class="description">
+                        Discover your dream home effortlessly. Explore diverse properties
+                        and expert guidance for a seamless buying experience.
+                    </p>
+                    <a asp-controller="User" asp-action="Properties" class="tf-btn btn-line">
+                        Learn More <span class="icon icon-arrow-right2"></span>
+                    </a>
+                </div>
+            </div>
+            <div class="box-service">
+                <div class="image">
+                    <img src="@Url.Content("~/images/service/home-2.png")" class="img-fluid" />
+                </div>
+                <div class="content">
+                    <h5 class="title">Sell a home</h5>
+                    <p class="description">
+                        Sell confidently with expert guidance and effective strategies,
+                        showcasing your property's best features for a successful sale.
+                    </p>
+                    <a asp-controller="User" asp-action="Properties" class="tf-btn btn-line">
+                        Learn More <span class="icon icon-arrow-right2"></span>
+                    </a>
+                </div>
+            </div>
+            <div class="box-service">
+                <div class="image">
+                    <img src="@Url.Content("~/images/service/home-3.png")" class="img-fluid" />
+                </div>
+                <div class="content">
+                    <h5 class="title">Rent a home</h5>
+                    <p class="description">
+                        Discover your perfect rental effortlessly. Explore a diverse
+                        variety of listings tailored precisely to suit your unique lifestyle needs.
+                    </p>
+                    <a asp-controller="User" asp-action="Properties" class="tf-btn btn-line">
+                        Learn More <span class="icon icon-arrow-right2"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+<section class="mx-5 bg-primary-new radius-30">
+    <div class="flat-img-with-text">
+        <img src="@Url.Content("~/images/banner/img-w-text1.jpg")" style="width:800px;"/>
+        <div class="content-right">
+            <div class="box-title wow fadeInUp">
+                <div class="text-subtitle text-primary">Our Benifit</div>
+                <h3 class="title mt-4">Why Choose HomeLengo</h3>
+                <p class="desc text-variant-1">
+                    Our seasoned team excels in real estate with years of
+                    successful market <br> navigation, offering informed decisions and optimal results.
+                </p>
+            </div>
+            <div class="flat-service wow fadeInUp" data-wow-delay=".2s">
+                <a href="#" class="box-benefit hover-btn-view">
+                    <div class="icon-box">
+                      
+                    </div>
+                    <div class="content">
+                        <h5 class="title">Proven Expertise</h5>
+                        <p class="description">
+                            Our seasoned team excels in real estate with years of
+                            successful market navigation, offering informed decisions and optimal results.
+                        </p>
+                    </div>
+                </a>
+                <a href="#" class="box-benefit hover-btn-view">
+                    <div class="icon-box">
+                        <span class="icon icon-customize"></span>
+                    </div>
+                    <div class="content">
+                        <h5 class="title">Customized Solutions</h5>
+                        <p class="description">
+                            We pride ourselves on crafting personalized strategies to
+                            match your unique goals, ensuring a seamless real estate journey.
+                        </p>
+                    </div>
+                </a>
+                <a href="#" class="box-benefit hover-btn-view">
+                    <div class="icon-box">
+                        <span class="icon icon-partnership"></span>
+                    </div>
+                    <div class="content">
+                        <h5 class="title">Transparent Partnerships</h5>
+                        <p class="description">
+                            Transparency is key in our client relationships. We
+                            prioritize clear communication and ethical practices, fostering trust and
+                            reliability throughout.
+                        </p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+<style>
+    /* Search Form */
+    .form-sl {
+        border-radius: 24px !important;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+        border: 1px solid rgba(255, 255, 255, 0.5) !important;
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95) !important;
+    }
+
+    /* Service Boxes */
+    .box-service {
+        border-radius: 20px !important;
+        border: 1px solid #e2e8f0 !important;
+        transition: all 0.3s ease;
+        background: #fff;
+    }
+    
+    .box-service:hover {
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1) !important;
+        transform: translateY(-5px);
+    }
+
+    .box-service .title {
+        font-weight: 800 !important;
+        color: #1e293b !important;
+    }
+
+    .box-title .title {
+        font-weight: 800 !important;
+        letter-spacing: -0.02em !important;
+    }
+
+    .text-subtitle {
+        font-weight: 700 !important;
+        letter-spacing: 0.1em !important;
+        text-transform: uppercase;
+        color: #2563eb !important;
+    }
+
+    .icon-box i {
+        font-size: 50px;
+        color: #2563eb;
+    }
+</style> *@
+
+@section Scripts {
+    <script>
+        function toggleFavorite(btn, propertyId) {
+            event.preventDefault();
+            
+            $.ajax({
+                type: "POST",
+                url: "/User/ToggleFavorite",
+                data: { propertyId: propertyId },
+                success: function (res) {
+                    if (res.success) {
+                        var icon = $(btn).find('i');
+                        if (res.isFavorite) {
+                            icon.removeClass('fa-regular').addClass('fa-solid text-danger');
+                        } else {
+                            icon.removeClass('fa-solid text-danger').addClass('fa-regular');
+                        }
+                    } else {
+                        window.location.href = '/Account/Login';
+                    }
+                },
+                error: function () {
+                    alert("Error toggling favorite. Make sure you are logged in.");
+                }
+            });
+        }
+    </script>
+}

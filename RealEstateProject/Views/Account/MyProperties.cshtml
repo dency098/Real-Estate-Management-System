@@ -1,0 +1,106 @@
+﻿@model List<RealEstateProject.Models.Property>
+
+<h2 class="mb-4">My Properties</h2>
+
+<div class="table-responsive shadow-sm rounded bg-white p-3">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Title</th>
+                <th>Price</th>
+                <th>City</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Title</td>
+                    <td>₹ @item.Price</td>
+                    <td>@item.City.CityName</td>
+                    <td>
+                        @if (item.Status == "Pending")
+                        {
+                            <span class="badge bg-warning text-dark">Pending</span>
+                        }
+                        else if (item.Status == "Approved")
+                        {
+                            <span class="badge bg-success">Approved</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Rejected</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<style>
+    /* Table card effect */
+    .table-responsive {
+        max-height: 500px; /* Scroll if too many items */
+        overflow-y: auto;
+    }
+
+    table.table-hover tbody tr:hover {
+        background-color: rgba(108, 99, 255, 0.05);
+        transition: background-color 0.2s;
+    }
+
+    th {
+        font-weight: 600;
+        color: #333;
+    }
+
+    td {
+        color: #555;
+    }
+
+    h2 {
+        color: #333;
+        font-weight: 600;
+    }
+</style>
+@* @model List<RealEstateProject.Models.Property>
+
+<h2>My Properties</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Price</th>
+            <th>City</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Title</td>
+                <td>₹ @item.Price</td>
+                <td>@item.City.CityName</td>
+                <td>
+                    @if (item.Status == "Pending")
+                    {
+                        <span class="badge bg-warning">Pending</span>
+                    }
+                    else if (item.Status == "Approved")
+                    {
+                        <span class="badge bg-success">Approved</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Rejected</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table> *@

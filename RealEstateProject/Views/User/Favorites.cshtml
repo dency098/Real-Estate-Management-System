@@ -1,0 +1,435 @@
+@model List<RealEstateProject.Models.Property>
+
+@{
+    ViewData["Title"] = "My Favorites";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+
+    body {
+        background: #f5f7fb;
+    }
+
+    /* ================= SECTION HEADER ================= */
+    .section-heading {
+        margin-top: 50px;
+        margin-bottom: 40px;
+    }
+
+        .section-heading h2 {
+            font-size: 42px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .section-heading p {
+            color: #64748b;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+    /* ================= PROPERTY CARD ================= */
+    .property-card {
+        background: white;
+        border-radius: 28px;
+        overflow: hidden;
+        transition: .35s;
+        position: relative;
+        border: 1px solid #edf2f7;
+        box-shadow: 0 8px 30px rgba(15,23,42,.05);
+    }
+
+        .property-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(15,23,42,.12);
+        }
+
+    /* IMAGE */
+    .property-image-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .property-image {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        transition: 0.6s;
+    }
+
+    .property-card:hover .property-image {
+        transform: scale(1.08);
+    }
+
+    .image-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,.65), rgba(0,0,0,.05));
+    }
+
+    /* TOP TAG */
+    .property-badge {
+        position: absolute;
+        top: 18px;
+        left: 18px;
+        z-index: 3;
+        padding: 10px 18px;
+        border-radius: 50px;
+        font-size: 13px;
+        font-weight: 700;
+        backdrop-filter: blur(10px);
+    }
+
+    .badge-sale {
+        background: rgba(37,99,235,.95);
+        color: white;
+    }
+
+    .badge-sold {
+        background: rgba(239,68,68,.95);
+        color: white;
+    }
+
+    /* FAVORITE */
+    .favorite-btn {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: rgba(255,255,255,.18);
+        backdrop-filter: blur(12px);
+        color: white;
+        border: none;
+        z-index: 3;
+        transition: .3s;
+    }
+
+        .favorite-btn:hover {
+            background: white;
+            color: #ef4444;
+        }
+
+    .property-location {
+        position: absolute;
+        bottom: 18px;
+        left: 18px;
+        z-index: 3;
+        color: white;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    /* CONTENT */
+    .property-content {
+        padding: 26px;
+    }
+
+    .property-title {
+        font-size: 24px;
+        font-weight: 800;
+        margin-bottom: 12px;
+        color: #0f172a;
+        line-height: 1.3;
+    }
+
+        .property-title a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+            .property-title a:hover {
+                color: #2563eb;
+            }
+
+    /* FEATURES */
+    .property-features {
+        display: flex;
+        gap: 14px;
+        margin-top: 20px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #f8fafc;
+        padding: 10px 14px;
+        border-radius: 14px;
+        font-size: 14px;
+        color: #334155;
+        font-weight: 600;
+    }
+
+        .feature-item i {
+            color: #2563eb;
+        }
+
+    /* BOTTOM */
+    .property-footer {
+        border-top: 1px solid #edf2f7;
+        padding-top: 22px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .agent-box {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .agent-img {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #eff6ff;
+    }
+
+    .agent-name {
+        font-size: 14px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .agent-role {
+        font-size: 12px;
+        color: #64748b;
+    }
+
+    .property-price {
+        text-align: right;
+    }
+
+        .property-price h4 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 800;
+            color: #2563eb;
+        }
+
+        .property-price span {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+    /* EMPTY */
+    .empty-box {
+        background: white;
+        border-radius: 28px;
+        padding: 80px 30px;
+        text-align: center;
+        box-shadow: 0 10px 40px rgba(15,23,42,.05);
+    }
+
+        .empty-box i {
+            font-size: 70px;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+        }
+
+        .empty-box h3 {
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .empty-box p {
+            color: #64748b;
+        }
+
+</style>
+
+<!-- ================= PROPERTIES ================= -->
+<div class="container">
+
+    <div class="section-heading text-center">
+        <h2>My Favorites</h2>
+        <p>Your handpicked premium properties.</p>
+    </div>
+
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="row g-4">
+
+            @foreach (var item in Model)
+            {
+                var image = item.ProperyImages?.FirstOrDefault()?.ImagePath;
+                if (string.IsNullOrEmpty(image))
+                {
+                    image = "/images/default.jpg";
+                }
+
+                <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+                    <div class="homelengo-box property-card"> <!-- Added property-card class -->
+
+                        <!-- IMAGE -->
+                        <div class="property-image-wrapper">
+
+                            <a asp-controller="User"
+                               asp-action="ViewProperty"
+                               asp-route-id="@item.ProperyId">
+
+                                <img src="@Url.Content(image)"
+                                     class="property-image" />
+
+                                <div class="image-overlay"></div>
+
+                            </a>
+
+                            <!-- BADGE -->
+                            @if (item.Status == "Sold")
+                            {
+                                <div class="property-badge badge-sold">
+                                    Sold
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="property-badge badge-sale">
+                                    For Sale
+                                </div>
+                            }
+
+                            <!-- FAVORITE -->
+                            @{
+                                var favList = ViewBag.FavoritePropertyIds as List<int>;
+                                var isFavorite = favList != null && favList.Contains(item.ProperyId);
+                            }
+                            <button class="favorite-btn" onclick="toggleFavorite(this, @item.ProperyId); return false;">
+                                <i class="@(isFavorite ? "fa-solid text-danger" : "fa-regular") fa-heart"></i>
+                            </button>
+
+                            <!-- LOCATION -->
+                            <div class="property-location">
+                                <i class="fa-solid fa-location-dot me-1"></i>
+                                @item.Address
+                            </div>
+
+                        </div>
+
+                        <!-- CONTENT -->
+                        <div class="property-content">
+
+                            <h3 class="property-title">
+                                <a asp-controller="User"
+                                   asp-action="ViewProperty"
+                                   asp-route-id="@item.ProperyId">
+                                    @item.Title
+                                </a>
+                            </h3>
+
+                            <!-- FEATURES -->
+                            <div class="property-features">
+
+                                <div class="feature-item">
+                                    <i class="fa-solid fa-bed"></i>
+                                    @item.Bedroom Beds
+                                </div>
+
+                                <div class="feature-item">
+                                    <i class="fa-solid fa-bath"></i>
+                                    @item.Bathrooms Baths
+                                </div>
+
+                                <div class="feature-item">
+                                    <i class="fa-solid fa-ruler-combined"></i>
+                                    @item.AreaSqft Sqft
+                                </div>
+
+                            </div>
+
+                            <!-- FOOTER -->
+                            <div class="property-footer">
+
+                                <!-- AGENT -->
+                                <div class="agent-box">
+
+                                    <img src="@(string.IsNullOrEmpty(item.User?.ProfileImage)
+                                        ? Url.Content("~/images/profile/default.png")
+                                        : Url.Content(item.User.ProfileImage))"
+                                         class="agent-img" />
+
+                                    <div>
+                                        <div class="agent-name">
+                                            @item.User?.FullName
+                                        </div>
+
+                                        <div class="agent-role">
+                                            Property Agent
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <!-- PRICE -->
+                                <div class="property-price">
+                                    <h4>
+                                        ₹ @item.Price
+                                    </h4>
+                                    <span>Starting Price</span>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            }
+
+        </div>
+    }
+    else
+    {
+        <div class="empty-box">
+
+            <i class="fa-regular fa-heart"></i>
+
+            <h3>No Favorites Found</h3>
+
+            <p>
+                You haven't added any properties to your favorites yet.
+            </p>
+
+        </div>
+    }
+
+</div>
+
+@section Scripts {
+    <script>
+        function toggleFavorite(btn, propertyId) {
+            // Prevent default action if inside a link
+            event.preventDefault();
+            
+            $.ajax({
+                type: "POST",
+                url: "/User/ToggleFavorite",
+                data: { propertyId: propertyId },
+                success: function (res) {
+                    if (res.success) {
+                        var icon = $(btn).find('i');
+                        if (res.isFavorite) {
+                            icon.removeClass('fa-regular').addClass('fa-solid text-danger');
+                        } else {
+                            icon.removeClass('fa-solid text-danger').addClass('fa-regular');
+                            // Optional: Remove the item from DOM if we are on the Favorites page
+                            $(btn).closest('.col-xl-4').fadeOut();
+                        }
+                    } else {
+                        window.location.href = '/Account/Login';
+                    }
+                },
+                error: function () {
+                    alert("Error toggling favorite. Make sure you are logged in.");
+                }
+            });
+        }
+    </script>
+}

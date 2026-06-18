@@ -1,0 +1,46 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Process Deal";
+    ViewData["ActivePage"] = "ProcessDeal";
+}
+@model RealEstateProject.Models.Enquiry
+
+<div class="container mt-5">
+
+    <div class="card p-4 shadow">
+
+        <h2 class="text-center mb-4">🧾 Invoice</h2>
+
+        <hr />
+
+        <p><strong>Invoice ID:</strong> INV-@Model.EnquiryId</p>
+        <p><strong>Date:</strong> @DateTime.Now.ToString("dd MMM yyyy")</p>
+
+        <hr />
+
+        <h5>Property Details</h5>
+        <p><strong>Property ID:</strong> @Model.PropertyId</p>
+        <p><strong>Price:</strong> ₹ @Model.PropertyPrice</p>
+
+        <hr />
+
+        <h5>Payment Details</h5>
+
+        <p><strong>Token Paid:</strong> ₹ @(Model.PropertyPrice * 0.05M)</p>
+        <p><strong>Commission Paid:</strong> ₹ @(Model.PropertyPrice * 0.02M)</p>
+
+        <hr />
+
+        <h4 class="text-end">
+            Total Paid: ₹ @(Model.PropertyPrice * 0.07M)
+        </h4>
+
+        <div class="text-center mt-4">
+            <button onclick="window.print()" class="btn btn-dark">
+                🖨️ Print Invoice
+            </button>
+        </div>
+
+    </div>
+
+</div>

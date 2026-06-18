@@ -1,0 +1,430 @@
+@model IEnumerable<dynamic>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Property Enquiries";
+    ViewData["ActivePage"] = "Enquiries";
+}
+
+<style>
+    /* Enterprise Table Styles */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border-color);
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .page-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-main);
+        margin: 0;
+    }
+
+    .page-subtitle {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        margin: 4px 0 0 0;
+    }
+
+    .section-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table th {
+        background: #f8fafc;
+        padding: 12px 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .data-table td {
+        padding: 16px 20px;
+        font-size: 0.875rem;
+        color: var(--text-main);
+        border-bottom: 1px solid var(--border-color);
+        vertical-align: middle;
+    }
+
+    .data-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .data-table tr:hover td {
+        background-color: #f8fafc;
+    }
+
+    .prop-title {
+        font-weight: 500;
+        color: #0f172a;
+    }
+
+    .user-name {
+        font-weight: 500;
+        color: #2563eb;
+    }
+    
+    .owner-name {
+        font-weight: 500;
+        color: #16a34a;
+    }
+
+    .badge-status {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        line-height: 1;
+    }
+
+    .badge-pending { background: #fef3c7; color: #b45309; }
+    .badge-approved { background: #dcfce7; color: #166534; }
+    .badge-rejected { background: #fee2e2; color: #991b1b; }
+    .badge-closed { background: #f1f5f9; color: #475569; }
+    .badge-sold { background: #e0e7ff; color: #3730a3; }
+
+    /* Flat Button */
+    .btn-action {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        color: #0f172a;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+    }
+
+    .btn-action:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #0f172a;
+    }
+
+    .btn-approve { border-color: #fcd34d; color: #d97706; }
+    .btn-approve:hover { background: #fef3c7; border-color: #f59e0b; color: #b45309; }
+
+    .btn-process { border-color: #93c5fd; color: #2563eb; }
+    .btn-process:hover { background: #eff6ff; border-color: #60a5fa; color: #1d4ed8; }
+    
+    .btn-notify { border-color: #86efac; color: #16a34a; }
+    .btn-notify:hover { background: #f0fdf4; border-color: #4ade80; color: #15803d; }
+    
+    /* Search & Filter */
+    .search-input {
+        padding: 8px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        font-size: 0.875rem;
+        outline: none;
+        min-width: 250px;
+        color: var(--text-main);
+    }
+
+    .search-input:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+    }
+
+    .filter-btn {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+        padding: 6px 16px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .filter-btn:hover {
+        background: #f8fafc;
+        color: var(--text-main);
+    }
+
+    .filter-btn.active {
+        background: #f1f5f9;
+        color: var(--text-main);
+        border-color: #cbd5e1;
+    }
+
+    /* Mobile Card Styles */
+    .enquiry-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+        cursor: pointer;
+    }
+
+    .enquiry-card:hover {
+        border-color: #cbd5e1;
+    }
+
+    form {
+        margin: 0;
+    }
+</style>
+
+<div class="container-fluid p-0">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Property Enquiries</h1>
+            <p class="page-subtitle">Manage communications and deal approvals.</p>
+        </div>
+        <div class="d-flex gap-3 flex-wrap">
+            <input type="text" id="searchBox" class="search-input" placeholder="Search property / user..." />
+            <div class="d-flex gap-2 flex-wrap">
+                <button class="filter-btn active" data-status="All">All</button>
+                <button class="filter-btn" data-status="Approved">Approved</button>
+                <button class="filter-btn" data-status="Pending">Pending</button>
+                <button class="filter-btn" data-status="Rejected">Rejected</button>
+                <button class="filter-btn" data-status="Sold">Sold</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABLE FOR DESKTOP -->
+    <div class="section-card d-none d-md-block">
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Property</th>
+                        <th>Sender</th>
+                        <th>Owner</th>
+                        <th>Message</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    @{ int count = 1; }
+                    @foreach (var item in Model)
+                    {
+                        bool isSold = item.PropertyStatus == "Sold";
+                        bool isRented = item.PropertyStatus == "Rented";
+                        bool isCompleted = item.Status == "Completed";
+                        <tr data-status="@(isSold ? "Sold" : (isCompleted ? "Completed" : item.Status))" onclick="window.location='/Admin/DealDetails/@item.EnquiryId'" style="cursor:pointer;">
+                            <td>@count</td>
+                            <td><span class="prop-title">@item.PropertyTitle</span></td>
+                            <td><span class="user-name">@item.SenderName</span></td>
+                            <td><span class="owner-name">@item.OwnerName</span></td>
+                            <td>
+                                <span class="text-muted" style="font-size: 0.8rem;">
+                                    @(item.Message.Length > 30 ? item.Message.Substring(0, 30) + "..." : item.Message)
+                                </span>
+                            </td>
+                            <td>
+                                <span class="text-muted" style="font-size: 0.8rem;">
+                                    @(item.CreatedAt != null ? Convert.ToDateTime(item.CreatedAt).ToString("dd MMM yyyy") : "N/A")
+                                </span>
+                            </td>
+                            <td>
+                                @if (isSold)
+                                {
+                                    <span class="badge-status badge-sold">Sold</span>
+                                }
+                                else if (isRented || isCompleted)
+                                {
+                                    <span class="badge-status badge-approved">Active Lease</span>
+                                }
+                                else if (item.Status == "Approved")
+                                {
+                                    <span class="badge-status badge-approved">Approved</span>
+                                }
+                                else if (item.Status == "Rejected")
+                                {
+                                    <span class="badge-status badge-rejected">Rejected</span>
+                                }
+                                else if (item.Status == "Closed")
+                                {
+                                    <span class="badge-status badge-closed">Closed</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-status badge-pending">Pending</span>
+                                }
+                            </td>
+                            <td onclick="event.stopPropagation();">
+                                <div class="d-flex justify-content-start gap-2 flex-wrap">
+                                    @if (!isSold)
+                                    {
+                                        <form asp-controller="Admin" asp-action="NotifyOwner" method="post">
+                                            <input type="hidden" name="ownerId" value="@item.OwnerUserId" />
+                                            <input type="hidden" name="senderId" value="@item.SenderUserId" />
+                                            <input type="hidden" name="enquiryId" value="@item.EnquiryId" />
+                                            <button class="btn-action btn-notify" onclick="return confirm('Send notification?')">
+                                                <i class="fa-regular fa-bell"></i>
+                                            </button>
+                                        </form>
+
+                                        @if ((item.Status == "Approved" || item.Status == "Pending") && !item.IsAdminApproved)
+                                        {
+                                            <a href="/Admin/ApproveDeal/@item.EnquiryId" class="btn-action btn-approve">
+                                                <i class="fa-solid fa-check"></i>
+                                            </a>
+                                        }
+
+                                        @if ((item.Status == "Approved" || item.Status == "Completed") && item.IsAdminApproved)
+                                        {
+                                            <a href="/Admin/ProcessDeal/@item.EnquiryId" class="btn-action btn-process">
+                                                <i class="fa-solid fa-play"></i>
+                                            </a>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-status badge-closed">Deal Closed</span>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                        count++;
+                    }
+                </tbody>
+            </table>
+            @if(!Model.Any())
+            {
+                <div class="text-center py-5 text-muted" style="font-size: 0.875rem;">
+                    <p class="m-0">No enquiries found.</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- MOBILE CARDS -->
+    <div class="d-md-none" id="cardContainer">
+        @foreach (var item in Model)
+        {
+            bool isSold = item.PropertyStatus == "Sold";
+            bool isRented = item.PropertyStatus == "Rented";
+            bool isCompleted = item.Status == "Completed";
+            <div class="enquiry-card" data-status="@(isSold ? "Sold" : (isCompleted ? "Completed" : item.Status))" onclick="window.location='/Admin/DealDetails/@item.EnquiryId'">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div class="prop-title">@item.PropertyTitle</div>
+                    @if (isSold)
+                    {
+                        <span class="badge-status badge-sold">Sold</span>
+                    }
+                    else if (isRented || isCompleted)
+                    {
+                        <span class="badge-status badge-approved">Active Lease</span>
+                    }
+                    else if (item.Status == "Approved")
+                    {
+                        <span class="badge-status badge-approved">Approved</span>
+                    }
+                    else if (item.Status == "Rejected")
+                    {
+                        <span class="badge-status badge-rejected">Rejected</span>
+                    }
+                    else if (item.Status == "Closed")
+                    {
+                        <span class="badge-status badge-closed">Closed</span>
+                    }
+                    else
+                    {
+                        <span class="badge-status badge-pending">Pending</span>
+                    }
+                </div>
+                
+                <div class="text-muted" style="font-size: 0.875rem;">
+                    <div>Sender: <span class="user-name">@item.SenderName</span></div>
+                    <div class="mb-2">Owner: <span class="owner-name">@item.OwnerName</span></div>
+                    <p class="mb-3">"@item.Message"</p>
+                </div>
+
+                <div class="d-flex gap-2" onclick="event.stopPropagation();">
+                    @if (!isSold)
+                    {
+                        @if ((item.Status == "Approved" || item.Status == "Pending") && !item.IsAdminApproved)
+                        {
+                            <a href="/Admin/ApproveDeal/@item.EnquiryId" class="btn-action btn-approve w-100 justify-content-center">
+                                Approve Deal
+                            </a>
+                        }
+                        
+                        @if ((item.Status == "Approved" || item.Status == "Completed") && item.IsAdminApproved)
+                        {
+                            <a href="/Admin/ProcessDeal/@item.EnquiryId" class="btn-action btn-process w-100 justify-content-center">
+                                @(isCompleted ? "Manage Lease" : "Start Deal")
+                            </a>
+                        }
+                    }
+                    else
+                    {
+                        <div class="w-100 text-center badge-status badge-closed d-block py-2">Deal Closed</div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const searchBox = document.getElementById("searchBox");
+        const rows = document.querySelectorAll("#tableBody tr");
+        const cards = document.querySelectorAll(".enquiry-card");
+        const filterButtons = document.querySelectorAll(".filter-btn");
+
+        // SEARCH
+        searchBox.addEventListener("keyup", function () {
+            let value = this.value.toLowerCase();
+            rows.forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(value) ? "" : "none";
+            });
+            cards.forEach(card => {
+                card.style.display = card.innerText.toLowerCase().includes(value) ? "" : "none";
+            });
+        });
+
+        // FILTER
+        filterButtons.forEach(btn => {
+            btn.addEventListener("click", function () {
+                // Update active state
+                filterButtons.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                let status = this.getAttribute("data-status");
+
+                rows.forEach(row => {
+                    row.style.display = (status === "All" || row.dataset.status === status) ? "" : "none";
+                });
+                cards.forEach(card => {
+                    card.style.display = (status === "All" || card.dataset.status === status) ? "" : "none";
+                });
+            });
+        });
+    });
+</script>

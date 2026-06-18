@@ -1,0 +1,76 @@
+﻿@model int
+
+<style>
+    .timeline {
+        position: relative;
+        margin-top: 20px;
+        padding-left: 30px;
+        border-left: 3px solid #ccc;
+    }
+
+    .timeline-step {
+        position: relative;
+        margin-bottom: 25px;
+    }
+
+        .timeline-step .circle {
+            position: absolute;
+            left: -12px;
+            top: 0;
+            width: 22px;
+            height: 22px;
+            background: #ccc;
+            border-radius: 50%;
+            text-align: center;
+            color: white;
+            font-size: 12px;
+            line-height: 22px;
+        }
+
+        .timeline-step.completed .circle {
+            background: green;
+        }
+
+        .timeline-step.current .circle {
+            background: orange;
+        }
+
+        .timeline-step .content {
+            margin-left: 10px;
+            font-size: 15px;
+        }
+</style>
+
+<div class="timeline">
+
+    <div class="timeline-step @(Model == 1 ? "current" : Model > 1 ? "completed" : "")">
+        <div class="circle">✔</div>
+        <div class="content">Meeting of Both Parties</div>
+    </div>
+
+    <div class="timeline-step @(Model == 2 ? "current" : Model > 2 ? "completed" : "")">
+        <div class="circle">✔</div>
+        <div class="content">Document Verification</div>
+    </div>
+
+    <div class="timeline-step @(Model == 3 ? "current" : Model > 3 ? "completed" : "")">
+        <div class="circle">✔</div>
+        <div class="content">Payment Process</div>
+    </div>
+
+    <div class="timeline-step @(Model == 4 ? "current" : Model > 4 ? "completed" : "")">
+        <div class="circle">✔</div>
+        <div class="content">Final Agreement</div>
+    </div>
+
+    <div class="timeline-step @(Model == 5 ? "current" : Model > 5 ? "completed" : "")">
+        <div class="circle">✔</div>
+        <div class="content">Admin Commission Payment</div>
+    </div>
+
+    <div class="timeline-step @(Model == 6 ? "completed" : "")">
+        <div class="circle">✔</div>
+        <div class="content text-success">Property Sold ✅</div>
+    </div>
+
+</div>

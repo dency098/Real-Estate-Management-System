@@ -1,0 +1,413 @@
+@model RealEstateProject.Models.Property
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Edit Property";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - RealEstateProject</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-soft: rgba(37, 99, 235, 0.1);
+            --sidebar-bg: #0f172a;
+            --bg-main: #f8fafc;
+            --glass-white: rgba(255, 255, 255, 0.95);
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --radius: 16px;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --border-light: #e2e8f0;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            font-family: 'Inter', system-ui, sans-serif;
+            color: var(--text-dark);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .dashboard-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar-menu-dashboard {
+            width: 280px;
+            background: var(--sidebar-bg);
+            color: #fff;
+            padding: 30px 20px;
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            box-shadow: 4px 0 24px rgba(0,0,0,0.1);
+        }
+
+        .logo-box {
+            display: block;
+            padding-bottom: 40px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 30px;
+        }
+
+        .logo-box img {
+            width: 160px;
+            filter: brightness(0) invert(1);
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .nav-menu-item {
+            margin-bottom: 8px;
+        }
+
+        .nav-menu-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            color: #94a3b8;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-menu-link i {
+            font-size: 1.1rem;
+            width: 24px;
+        }
+
+        .nav-menu-link:hover {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+        }
+
+        .nav-menu-item.active .nav-menu-link {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4);
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            margin-left: 280px;
+            padding: 40px;
+            width: calc(100% - 280px);
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .header-section h2 {
+            font-weight: 800;
+            font-size: 1.8rem;
+            letter-spacing: -0.02em;
+        }
+
+        /* --- FORM STYLES --- */
+        .form-card {
+            background: var(--glass-white);
+            padding: 40px;
+            border-radius: var(--radius);
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            max-width: 900px;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--primary);
+            margin: 30px 0 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-control, select, textarea {
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 0.95rem;
+            width: 100%;
+            transition: all 0.2s ease;
+            background: #fcfdfe;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+        }
+
+        .btn-submit {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px 30px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-submit:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2);
+        }
+        
+        .btn-back {
+            background: #fff;
+            color: var(--text-dark);
+            border: 1px solid var(--border-light);
+            padding: 16px 30px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: 0.3s;
+            display: inline-block;
+        }
+        
+        .btn-back:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+        
+        .upload-zone {
+            border: 2px dashed var(--border-light);
+            border-radius: 12px;
+            padding: 20px;
+            background: #f8fafc;
+            transition: 0.2s;
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    <!-- SIDEBAR -->
+    <aside class="sidebar-menu-dashboard">
+        <a href="#" class="logo-box">
+            <img src="@Url.Content("~/images/logo/logo-footer@2x.png")" alt="Logo" />
+        </a>
+
+        <ul class="nav-list">
+            <li class="nav-menu-item">
+                <a class="nav-menu-link" asp-controller="User" asp-action="Dashboard">
+                    <i class="fa-solid fa-chart-line"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-menu-item">
+                <a class="nav-menu-link" asp-controller="User" asp-action="Profile">
+                    <i class="fa-solid fa-circle-user"></i> Profile
+                </a>
+            </li>
+            <li class="nav-menu-item active">
+                <a class="nav-menu-link" asp-controller="User" asp-action="MyProperties">
+                    <i class="fa-solid fa-house-chimney"></i> My Properties
+                </a>
+            </li>
+            <li class="nav-menu-item">
+                <a class="nav-menu-link" asp-controller="User" asp-action="MyEnquiries">
+                    <i class="fa-solid fa-handshake"></i> My Property Deals
+                </a>
+            </li>
+            <li class="nav-menu-item">
+                <a class="nav-menu-link" asp-controller="User" asp-action="Property">
+                    <i class="fa-solid fa-square-plus"></i> Add Property
+                </a>
+            </li>
+            <li class="nav-menu-item mt-4">
+                <a class="nav-menu-link text-danger" asp-controller="Account" asp-action="Logout" onclick="return confirm('Logout?');">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <div class="header-section">
+            <div>
+                <h2>✏️ Edit Property</h2>
+                <p class="text-muted small">Update the details for your existing listing</p>
+            </div>
+        </div>
+
+        <div class="form-card mx-auto">
+            <form asp-action="EditProperty" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="ProperyId" />
+
+                <div class="section-title"><i class="fa fa-info-circle"></i> General Information</div>
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label>Title</label>
+                        <input asp-for="Title" class="form-control" required />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <label>Price</label>
+                        <input asp-for="Price" class="form-control" required />
+                        <span asp-validation-for="Price" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <label>Property Type</label>
+                        <select asp-for="PropertyType" class="form-control" required>
+                            <option>Apartment</option>
+                            <option>Villa</option>
+                            <option>Plot</option>
+                            <option>Sell</option>
+                            <option>Rent</option>
+                        </select>
+                        <span asp-validation-for="PropertyType" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <label>Category</label>
+                        <select asp-for="CategoryId" class="form-control"
+                                asp-items="@(new SelectList(ViewBag.Categories, "CategoryId", "CategoryName"))" required>
+                        </select>
+                        <span asp-validation-for="CategoryId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="section-title"><i class="fa fa-ruler-combined"></i> Configuration</div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label>Area (sqft)</label>
+                        <input asp-for="AreaSqft" class="form-control" required />
+                        <span asp-validation-for="AreaSqft" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>Bedrooms</label>
+                        <input asp-for="Bedroom" class="form-control" />
+                        <span asp-validation-for="Bedroom" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>Bathrooms</label>
+                        <input asp-for="Bathrooms" class="form-control" />
+                        <span asp-validation-for="Bathrooms" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label>Furnishing</label>
+                        <select asp-for="Furnishing" class="form-control" required>
+                            <option>Furnished</option>
+                            <option>Semi-Furnished</option>
+                            <option>Unfurnished</option>
+                        </select>
+                        <span asp-validation-for="Furnishing" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="section-title"><i class="fa fa-map-marker-alt"></i> Location & Media</div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>City</label>
+                        <select asp-for="CityId" class="form-control"
+                                asp-items="@(new SelectList(ViewBag.Cities, "CityId", "CityName"))" required>
+                        </select>
+                        <span asp-validation-for="CityId" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Pincode</label>
+                        <input asp-for="Pincode" class="form-control" />
+                        <span asp-validation-for="Pincode" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label>Full Address</label>
+                        <input asp-for="Address" class="form-control" required />
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-12 mb-4">
+                        <label>Change Property Photo (Optional)</label>
+                        <div class="upload-zone">
+                            <input type="file" name="ImageFiles" class="form-control" multiple onchange="previewImage(event)" />
+                            <div id="previewContainer" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:20px; justify-content:center;"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 mb-4">
+                        <label>Change Property Video (Optional)</label>
+                        <div class="upload-zone">
+                            <input type="file" name="VideoFile" accept="video/*" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 mb-4">
+                    <label>Description</label>
+                    <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                
+                <div class="mt-4 d-flex justify-content-between">
+                    <a asp-action="MyProperties" class="btn-back">
+                        <i class="fa-solid fa-arrow-left me-2"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn-submit">
+                        <i class="fa-solid fa-floppy-disk me-2"></i> Submit for Approval
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+
+<partial name="_ValidationScriptsPartial" />
+
+<script>
+    function previewImage(event) {
+        var container = document.getElementById('previewContainer');
+        container.innerHTML = '';
+        var files = event.target.files;
+
+        for (let i = 0; i < files.length; i++) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                let img = document.createElement('img');
+                img.src = e.target.result;
+                img.style.width = "120px";
+                img.style.height = "100px";
+                img.style.objectFit = "cover";
+                img.style.borderRadius = "8px";
+                img.style.boxShadow = "var(--card-shadow)";
+                container.appendChild(img);
+            }
+            reader.readAsDataURL(files[i]);
+        }
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

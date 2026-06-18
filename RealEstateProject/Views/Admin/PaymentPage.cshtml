@@ -1,0 +1,154 @@
+﻿<style>
+    body {
+        background: linear-gradient(135deg, #eef2f7, #e3eaf3);
+    }
+
+    /* Wrapper */
+    .payment-wrapper {
+        height: 100vh;
+    }
+
+    /* Card */
+    .payment-card {
+        background: #fff;
+        padding: 40px;
+        border-radius: 20px;
+        width: 350px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    /* Icon */
+    .icon {
+        font-size: 40px;
+        color: #0d6efd;
+    }
+
+    /* Amount box */
+    .amount-box {
+        font-size: 28px;
+        font-weight: bold;
+        color: #198754;
+        background: #f1f8f5;
+        padding: 12px;
+        border-radius: 10px;
+    }
+
+    /* Button */
+    .btn-pay {
+        background: linear-gradient(45deg, #0d6efd, #00c6ff);
+        border: none;
+        color: #fff;
+        padding: 12px;
+        font-weight: 600;
+        border-radius: 10px;
+        transition: 0.3s;
+    }
+
+        .btn-pay:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+    /* Spinner */
+    .spinner {
+        width: 35px;
+        height: 35px;
+        border: 4px solid #ddd;
+        border-top: 4px solid #0d6efd;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: auto;
+    }
+
+    /* Footer */
+    .secure-text {
+        font-size: 12px;
+        color: #888;
+    }
+
+    /* Animations */
+    @@keyframes spin {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="payment-wrapper d-flex justify-content-center align-items-center">
+
+    <div class="payment-card text-center">
+
+        <!-- Icon -->
+        <div class="icon mb-3">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+
+        <!-- Title -->
+        <h4 class="fw-bold mb-2">
+            Secure Payment
+        </h4>
+
+        <!-- Sub -->
+        <p class="text-muted mb-3">
+            Complete your transaction safely
+        </p>
+
+        <!-- Amount -->
+        <div class="amount-box mb-4">
+            ₹ @ViewBag.Amount
+        </div>
+
+        <!-- Loader -->
+        <div class="spinner mb-4"></div>
+
+        <!-- Button -->
+        <button id="pay-btn" class="btn btn-pay w-100">
+            <i class="fas fa-credit-card me-2"></i> Pay Now
+        </button>
+
+        <!-- Footer -->
+        <p class="secure-text mt-3">
+            🔒 Secured by Razorpay
+        </p>
+
+    </div>
+
+</div>
+
+
+
+@* <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<button id="pay-btn" class="btn btn-success">Pay Now</button>
+
+<script>
+    var options = {
+        "key": "YOUR_KEY",
+        "amount": "@ViewBag.Amount",
+        "currency": "INR",
+        "order_id": "@ViewBag.OrderId",
+
+        "handler": function (response) {
+            window.location.href = "/Admin/PaymentSuccess?id=@Model.EnquiryId";
+        }
+    };
+
+    var rzp = new Razorpay(options);
+
+    document.getElementById('pay-btn').onclick = function () {
+        rzp.open();
+    };
+</script> *@

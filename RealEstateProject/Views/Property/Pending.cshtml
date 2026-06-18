@@ -1,0 +1,176 @@
+@model List<RealEstateProject.Models.Property>
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Pending Properties";
+    ViewData["ActivePage"] = "Property";
+}
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border-color);
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .page-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-main);
+        margin: 0;
+    }
+
+    .page-subtitle {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        margin: 4px 0 0 0;
+    }
+
+    .section-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table th {
+        background: #f8fafc;
+        padding: 12px 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .data-table td {
+        padding: 16px 20px;
+        font-size: 0.875rem;
+        color: var(--text-main);
+        border-bottom: 1px solid var(--border-color);
+        vertical-align: middle;
+    }
+
+    .data-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .data-table tr:hover td {
+        background-color: #f8fafc;
+    }
+
+    .property-title {
+        font-weight: 500;
+        color: #0f172a;
+    }
+
+    .badge-status {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .badge-warning { background: #fef3c7; color: #b45309; }
+
+    .btn-action {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        color: #0f172a;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+    }
+
+    .btn-action:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+        color: #0f172a;
+    }
+
+    .btn-success-action { border-color: #86efac; color: #166534; }
+    .btn-success-action:hover { background: #f0fdf4; border-color: #4ade80; color: #14532d; }
+
+    .btn-danger-action { border-color: #fca5a5; color: #dc2626; }
+    .btn-danger-action:hover { background: #fef2f2; border-color: #ef4444; color: #b91c1c; }
+</style>
+
+<div class="container-fluid p-0">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Pending Properties</h1>
+            <p class="page-subtitle">Review and approve properties submitted by users.</p>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Price</th>
+                        <th>City</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="property-title">@item.Title</span></td>
+                            <td>₹ @item.Price.ToString("N0")</td>
+                            <td class="text-muted">@item.City.CityName</td>
+                            <td class="text-muted">@item.Category.CategoryName</td>
+                            <td>
+                                <span class="badge-status badge-warning">@item.Status</span>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a asp-action="Approve" asp-route-id="@item.ProperyId" class="btn-action btn-success-action">
+                                        <i class="fa-solid fa-check"></i> Approve
+                                    </a>
+                                    <a asp-action="Reject" asp-route-id="@item.ProperyId" class="btn-action btn-danger-action">
+                                        <i class="fa-solid fa-xmark"></i> Reject
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if(!Model.Any())
+            {
+                <div class="text-center py-5 text-muted" style="font-size: 0.875rem;">
+                    <p class="m-0">No pending properties found.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

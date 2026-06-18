@@ -1,0 +1,8 @@
+﻿.vs/
+bin/
+obj/
+build/
+.gradle/
+.idea/
+local.properties
+RealEstateProject/wwwroot.zip

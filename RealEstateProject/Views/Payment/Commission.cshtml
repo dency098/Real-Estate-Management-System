@@ -1,0 +1,36 @@
+﻿@model RealEstateProject.Models.Enquiry
+
+<h2>Commission Payment</h2>
+
+<div class="card p-4">
+
+    <p><strong>Property:</strong> @Model.Property.Title</p>
+    <p><strong>Buyer:</strong> @Model.SenderUser?.FullName</p>
+    <p><strong>Owner:</strong> @Model.OwnerUser?.FullName</p>
+    <p><strong>Price:</strong> ₹@Model.PropertyPrice</p>
+
+    <p><strong>Admin Commission (2%):</strong> ₹@Model.AdminCommission</p>
+
+    <hr />
+
+    <form method="post" action="/Payment/Pay">
+        <input type="hidden" name="enquiryId" value="@Model.EnquiryId" />
+        <input type="hidden" name="role" value="Buyer" />
+
+        <button class="btn btn-primary" @(Model.IsBuyerPaid ? "disabled" : "")>
+            Buyer Pay
+        </button>
+    </form>
+
+    <br />
+
+    <form method="post" action="/Payment/Pay">
+        <input type="hidden" name="enquiryId" value="@Model.EnquiryId" />
+        <input type="hidden" name="role" value="Owner" />
+
+        <button class="btn btn-success" @(Model.IsOwnerPaid ? "disabled" : "")>
+            Owner Pay
+        </button>
+    </form>
+
+</div>

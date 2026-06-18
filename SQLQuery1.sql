@@ -1,0 +1,5 @@
+﻿ALTER TABLE [User] 
+ADD CONSTRAINT DF_User_CreatedAt 
+DEFAULT GETUTCDATE() FOR [Created_at];
+
+

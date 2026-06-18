@@ -1,0 +1,250 @@
+@model IEnumerable<RealEstateProject.Models.Property>
+
+@{
+    ViewData["Title"] = "Properties";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    :root {
+        --primary: #0d6efd; 
+        --dark: #222222;
+        --muted: #717171;
+        --border: #dddddd;
+        --bg: #f7f7f7;
+    }
+    body { background: var(--bg); font-family: 'Outfit', sans-serif; }
+    
+    /* Search Bar Header */
+    .search-header { background: #fff; border-bottom: 1px solid var(--border); padding: 24px 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.02); margin-top: -24px; }
+    .search-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    
+    .search-form-row { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid var(--border); border-radius: 40px; padding: 8px 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    
+    .search-field { flex: 1; border-right: 1px solid var(--border); padding: 0 16px; display: flex; flex-direction: column; }
+    .search-field:last-child { border-right: none; }
+    .search-label { font-size: 12px; font-weight: 700; color: var(--dark); text-transform: uppercase; margin-bottom: 2px; }
+    .search-input { border: none; outline: none; font-size: 14px; color: var(--muted); width: 100%; background: transparent; padding: 0; }
+    .search-input::placeholder { color: var(--muted); }
+    .search-select { border: none; outline: none; font-size: 14px; color: var(--muted); width: 100%; background: transparent; padding: 0; cursor: pointer; }
+    
+    .search-btn { background: var(--primary); color: #fff; border: none; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; transition: 0.2s; flex-shrink: 0; margin-left: 8px; }
+    .search-btn:hover { background: #0b5ed7; }
+    
+    /* Amenities Toggle (Optional Extra Filters) */
+    .advanced-filters-btn { background: transparent; border: 1px solid var(--border); border-radius: 20px; padding: 8px 16px; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; margin-top: 16px; transition: 0.2s; }
+    .advanced-filters-btn:hover { background: #f0f0f0; }
+    
+    /* Property Grid */
+    .properties-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; min-height: 50vh; }
+    .page-title { font-size: 24px; font-weight: 700; color: var(--dark); margin-bottom: 24px; }
+    
+    .property-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 24px; }
+    
+    /* Property Card */
+    .property-card { background: #fff; border: 1px solid transparent; border-radius: 16px; overflow: hidden; transition: 0.2s; cursor: pointer; display: flex; flex-direction: column; height: 100%; }
+    .property-card:hover { box-shadow: 0 12px 24px rgba(0,0,0,0.08); }
+    
+    .card-img-container { position: relative; width: 100%; aspect-ratio: 1 / 0.95; overflow: hidden; }
+    .card-img { width: 100%; height: 100%; object-fit: cover; transition: 0.3s; }
+    .property-card:hover .card-img { transform: scale(1.03); }
+    
+    .card-badge { position: absolute; top: 12px; left: 12px; background: rgba(255,255,255,0.9); color: var(--dark); font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    
+    .card-content { padding: 16px 4px; flex: 1; display: flex; flex-direction: column; }
+    .card-location { font-size: 15px; font-weight: 600; color: var(--dark); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-title { font-size: 15px; color: var(--muted); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 400; }
+    
+    .card-features { display: flex; gap: 12px; font-size: 14px; color: var(--muted); margin-bottom: 12px; }
+    
+    .card-price { font-size: 16px; font-weight: 700; color: var(--dark); margin-top: auto; }
+    
+    /* Responsive */
+    @@media (max-width: 992px) {
+        .search-form-row { flex-direction: column; align-items: stretch; border-radius: 16px; padding: 16px; gap: 16px; }
+        .search-field { border-right: none; border-bottom: 1px solid var(--border); padding: 0 0 12px 0; }
+        .search-field:last-child { border-bottom: none; padding-bottom: 0; }
+        .search-btn { width: 100%; border-radius: 8px; margin-top: 8px; margin-left: 0; }
+    }
+</style>
+
+<!-- Search Header -->
+<div class="search-header">
+    <div class="search-container">
+        <form asp-action="Listing" method="get">
+            <div class="search-form-row">
+                
+                <!-- Location -->
+                <div class="search-field">
+                    <div class="search-label">Location</div>
+                    <input type="text" name="location" class="search-input" value="@Context.Request.Query["location"]" placeholder="City, Area, or Property Name" />
+                </div>
+                
+                <!-- Property Type (Buy/Rent) -->
+                <div class="search-field">
+                    <div class="search-label">Looking To</div>
+                    <select name="propertyType" class="search-select">
+                        <option value="">Any (Buy/Rent)</option>
+                        @{
+                            var buySelected = Context.Request.Query["propertyType"] == "Buy" ? "selected" : null;
+                            var rentSelected = Context.Request.Query["propertyType"] == "Rent" ? "selected" : null;
+                        }
+                        <option value="Buy" selected="@buySelected">Buy</option>
+                        <option value="Rent" selected="@rentSelected">Rent</option>
+                    </select>
+                </div>
+                
+                <!-- Category (Apartment/Villa) -->
+                <div class="search-field">
+                    <div class="search-label">Property Type</div>
+                    <select name="categoryName" class="search-select">
+                        <option value="">Any Type</option>
+                        @{
+                            var aptSelected = Context.Request.Query["categoryName"] == "Apartment" ? "selected" : null;
+                            var villaSelected = Context.Request.Query["categoryName"] == "Villa" ? "selected" : null;
+                            var houseSelected = Context.Request.Query["categoryName"] == "House" ? "selected" : null;
+                        }
+                        <option value="Apartment" selected="@aptSelected">Apartment</option>
+                        <option value="Villa" selected="@villaSelected">Villa</option>
+                        <option value="House" selected="@houseSelected">House</option>
+                    </select>
+                </div>
+                
+                <!-- Bedrooms -->
+                <div class="search-field">
+                    <div class="search-label">Bedrooms</div>
+                    <select name="bedrooms" class="search-select">
+                        <option value="">Any</option>
+                        @{
+                            var b1 = Context.Request.Query["bedrooms"] == "1" ? "selected" : null;
+                            var b2 = Context.Request.Query["bedrooms"] == "2" ? "selected" : null;
+                            var b3 = Context.Request.Query["bedrooms"] == "3" ? "selected" : null;
+                            var b4 = Context.Request.Query["bedrooms"] == "4" ? "selected" : null;
+                        }
+                        <option value="1" selected="@b1">1 BHK</option>
+                        <option value="2" selected="@b2">2 BHK</option>
+                        <option value="3" selected="@b3">3 BHK</option>
+                        <option value="4" selected="@b4">4+ BHK</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="search-btn">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+                
+            </div>
+            
+            <button type="button" class="advanced-filters-btn" data-bs-toggle="collapse" data-bs-target="#advancedFilters">
+                <i class="fa-solid fa-sliders"></i> Filters & Sort
+            </button>
+            
+            <div class="collapse mt-3" id="advancedFilters">
+                <div class="card card-body border-0 shadow-sm" style="border-radius: 16px; border: 1px solid var(--border) !important; padding: 24px;">
+                    <div class="row g-4">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold text-uppercase text-muted" style="font-size: 11px; letter-spacing: 0.5px;">Min Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0" style="border-radius: 8px 0 0 8px;">₹</span>
+                                <input type="number" name="minPrice" class="form-control border-start-0 ps-0 shadow-none" style="border-radius: 0 8px 8px 0; background: transparent;" value="@Context.Request.Query["minPrice"]" placeholder="Any" />
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold text-uppercase text-muted" style="font-size: 11px; letter-spacing: 0.5px;">Max Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0" style="border-radius: 8px 0 0 8px;">₹</span>
+                                <input type="number" name="maxPrice" class="form-control border-start-0 ps-0 shadow-none" style="border-radius: 0 8px 8px 0; background: transparent;" value="@Context.Request.Query["maxPrice"]" placeholder="Any" />
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold text-uppercase text-muted" style="font-size: 11px; letter-spacing: 0.5px;">Sort By</label>
+                            <select name="sortOrder" class="form-select shadow-none" style="border-radius: 8px; height: 38px;">
+                                @{
+                                    var s_new = Context.Request.Query["sortOrder"] == "newest" ? "selected" : null;
+                                    var s_old = Context.Request.Query["sortOrder"] == "oldest" ? "selected" : null;
+                                    var s_pa = Context.Request.Query["sortOrder"] == "price_asc" ? "selected" : null;
+                                    var s_pd = Context.Request.Query["sortOrder"] == "price_desc" ? "selected" : null;
+                                }
+                                <option value="newest" selected="@s_new">Newest First</option>
+                                <option value="oldest" selected="@s_old">Oldest First</option>
+                                <option value="price_asc" selected="@s_pa">Price: Low to High</option>
+                                <option value="price_desc" selected="@s_pd">Price: High to Low</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end gap-2">
+                            <a href="@Url.Action("Listing")" class="btn btn-light flex-grow-1 shadow-sm" style="border-radius: 8px; font-weight: 600; height: 38px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);">Reset</a>
+                            <button type="submit" class="btn btn-primary flex-grow-1 shadow-sm" style="border-radius: 8px; font-weight: 600; height: 38px; display: flex; align-items: center; justify-content: center; background: var(--primary); border: none;">Apply</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="properties-container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <h1 class="page-title mb-0">@Model.Count() properties found</h1>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="fa-regular fa-folder-open text-muted" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+            <h3 class="fw-bold">No Properties Found</h3>
+            <p class="text-muted">Try adjusting your search filters to find what you're looking for.</p>
+        </div>
+    }
+
+    <div class="property-grid">
+        @foreach (var item in Model)
+        {
+            var image = item.ProperyImages?.FirstOrDefault()?.ImagePath ?? "/images/default.jpg";
+            
+            <a href="@Url.Action("ViewProperty", "User", new { id = item.ProperyId })" class="text-decoration-none">
+                <div class="property-card">
+                    <div class="card-img-container">
+                        <img src="@Url.Content(image)" class="card-img" alt="Property Image" />
+                        <div class="card-badge">
+                            @if (item.Status == "Sold")
+                            {
+                                <span class="text-danger">Sold</span>
+                            }
+                            else if (item.Status == "Rented")
+                            {
+                                <span class="text-warning">Rented</span>
+                            }
+                            else
+                            {
+                                <span>For @(item.PropertyType == "Sell" ? "Sale" : "Rent")</span>
+                            }
+                        </div>
+                        <button class="btn btn-light position-absolute top-0 end-0 m-3 rounded-circle shadow-sm" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; z-index: 10;">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="card-content">
+                        <div class="card-location">@(item.City?.CityName ?? "Location N/A"), @item.Address</div>
+                        <div class="card-title">@item.Title</div>
+                        
+                        <div class="card-features">
+                            <span>@item.Bedroom Beds</span>
+                            <span>·</span>
+                            <span>@item.Bathrooms Baths</span>
+                            <span>·</span>
+                            <span>@item.AreaSqft Sqft</span>
+                        </div>
+                        
+                        <div class="card-price">
+                            ₹@item.Price.ToString("N0")
+                            @if (item.PropertyType == "Rent")
+                            {
+                                <span style="font-size: 14px; font-weight: 400; color: var(--muted);">/ month</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </a>
+        }
+    </div>
+</div>

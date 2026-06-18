@@ -1,0 +1,684 @@
+@model IEnumerable<RealEstateProject.Models.Property>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Property List";
+    ViewData["ActivePage"] = "Property";
+}
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 32px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-color);
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin: 0 0 4px 0;
+        letter-spacing: -0.02em;
+    }
+
+    .page-subtitle {
+        font-size: 0.9375rem;
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+    /* Real Estate Grid Cards */
+    .property-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+        gap: 24px;
+    }
+
+    .property-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.025);
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        overflow: hidden;
+    }
+
+    .property-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Image Header */
+    .property-image-header {
+        height: 220px;
+        background-color: #cbd5e1;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 16px;
+    }
+
+    /* Add a subtle gradient overlay so text is readable */
+    .property-image-header::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 100%);
+        z-index: 1;
+    }
+
+    .property-image-header > * {
+        position: relative;
+        z-index: 2;
+    }
+
+    .property-price {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin: 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .badge-status {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        background: rgba(255,255,255,0.9);
+        color: var(--text-main);
+        backdrop-filter: blur(4px);
+        align-self: flex-start;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .badge-pending { color: #b45309; }
+    .badge-approved { color: #166534; }
+    .badge-rejected { color: #dc2626; }
+    .badge-sold { background: #0f172a; color: #ffffff; }
+
+    /* Card Body */
+    .property-body {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    .property-type {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--primary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 8px;
+    }
+
+    .property-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #0f172a;
+        margin: 0 0 8px 0;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .property-address {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        margin: 0 0 16px 0;
+        display: flex;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .property-address i {
+        margin-top: 3px;
+        color: #94a3b8;
+    }
+
+    /* Key Amenities Row */
+    .property-amenities {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding-top: 16px;
+        margin-top: auto;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .amenity-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.875rem;
+        color: #475569;
+        font-weight: 500;
+    }
+
+    .amenity-item i {
+        color: #94a3b8;
+        font-size: 1rem;
+    }
+
+    /* Actions Footer */
+    .property-actions {
+        padding: 16px 20px;
+        display: flex;
+        gap: 8px;
+        background: #f8fafc;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .btn-action {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        color: #475569;
+        padding: 8px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        flex: 1;
+    }
+
+    .btn-action:hover {
+        background: #f1f5f9;
+        color: #0f172a;
+        border-color: #cbd5e1;
+    }
+
+    .btn-action i {
+        font-size: 1rem;
+    }
+
+    .btn-primary-action {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: #ffffff;
+        padding: 10px 20px;
+        flex: none;
+    }
+
+    .btn-primary-action:hover {
+        background: var(--primary-hover);
+        border-color: var(--primary-hover);
+        color: #ffffff;
+    }
+
+    /* Filter and Sort Bar styling */
+    .filter-sort-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 12px 16px;
+        flex-wrap: wrap;
+        gap: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.025);
+    }
+
+    .status-tabs-container {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .status-tab {
+        background: transparent;
+        border: 1px solid transparent;
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .status-tab:hover {
+        background: #f1f5f9;
+        color: var(--text-main);
+    }
+
+    .status-tab.active {
+        background: #eff6ff;
+        border-color: #bfdbfe;
+        color: #2563eb;
+        font-weight: 600;
+    }
+
+    .badge-count {
+        font-size: 0.75rem;
+        background: #cbd5e1;
+        color: #475569;
+        padding: 2px 6px;
+        border-radius: 10px;
+        margin-left: 6px;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    .status-tab.active .badge-count {
+        background: #2563eb;
+        color: #ffffff;
+    }
+
+    /* Status specific badge colors */
+    .count-pending { background: #fef3c7; color: #b45309; }
+    .count-edit-pending { background: #e0f2fe; color: #0369a1; }
+    .count-delete-requested { background: #fee2e2; color: #b91c1c; }
+    .count-approved { background: #dcfce7; color: #15803d; }
+    .count-rejected { background: #fee2e2; color: #b91c1c; }
+    .count-sold { background: #f1f5f9; color: #0f172a; }
+
+    .status-tab.active .count-pending { background: #b45309; color: #ffffff; }
+    .status-tab.active .count-edit-pending { background: #0369a1; color: #ffffff; }
+    .status-tab.active .count-delete-requested { background: #b91c1c; color: #ffffff; }
+    .status-tab.active .count-approved { background: #15803d; color: #ffffff; }
+    .status-tab.active .count-rejected { background: #b91c1c; color: #ffffff; }
+    .status-tab.active .count-sold { background: #0f172a; color: #ffffff; }
+
+    .sort-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .sort-label {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .sort-select {
+        padding: 6px 36px 6px 12px;
+        font-size: 0.875rem;
+        border-color: var(--border-color);
+        border-radius: 8px;
+        font-weight: 500;
+        color: var(--text-main);
+        cursor: pointer;
+        width: 190px;
+    }
+
+    .sort-select:focus {
+        border-color: #bfdbfe;
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+    }
+
+    .badge-edit-pending { color: #0284c7; }
+    .badge-delete-requested { color: #dc2626; }
+</style>
+
+<div class="container-fluid p-0">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Property Portfolio</h1>
+            <p class="page-subtitle">Manage listings, approve submissions, and oversee real estate assets.</p>
+        </div>
+        <div>
+            <a asp-action="Create" class="btn-action btn-primary-action" style="flex: none;">
+                <i class="fa-solid fa-plus me-2"></i> Add Listing
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters & Sorting Bar -->
+    <div class="filter-sort-bar mb-4">
+        <div class="status-tabs-container">
+            <button class="status-tab active" data-status="all">
+                <i class="fa-solid fa-layer-group me-1"></i> All <span class="badge-count" id="count-all">0</span>
+            </button>
+            <button class="status-tab" data-status="Pending">
+                <i class="fa-solid fa-clock me-1"></i> Pending <span class="badge-count count-pending" id="count-pending">0</span>
+            </button>
+            <button class="status-tab" data-status="EditPending">
+                <i class="fa-solid fa-pen-to-square me-1"></i> Edit Pending <span class="badge-count count-edit-pending" id="count-edit-pending">0</span>
+            </button>
+            <button class="status-tab" data-status="DeleteRequested">
+                <i class="fa-solid fa-trash-can me-1"></i> Delete Request <span class="badge-count count-delete-requested" id="count-delete-requested">0</span>
+            </button>
+            <button class="status-tab" data-status="Approved">
+                <i class="fa-solid fa-circle-check me-1"></i> Approved <span class="badge-count count-approved" id="count-approved">0</span>
+            </button>
+            <button class="status-tab" data-status="Rejected">
+                <i class="fa-solid fa-circle-xmark me-1"></i> Rejected <span class="badge-count count-rejected" id="count-rejected">0</span>
+            </button>
+            <button class="status-tab" data-status="Sold">
+                <i class="fa-solid fa-tag me-1"></i> Sold <span class="badge-count count-sold" id="count-sold">0</span>
+            </button>
+        </div>
+        
+        <div class="sort-container">
+            <label for="sortBySelect" class="sort-label"><i class="fa-solid fa-sort me-1"></i> Sort By:</label>
+            <select id="sortBySelect" class="form-select sort-select">
+                <option value="status-priority">Status Priority</option>
+                <option value="newest">Newest First</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="title-asc">Title: A-Z</option>
+            </select>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="section-card text-center py-5 text-muted" style="font-size: 0.875rem;">
+            <i class="fa-solid fa-house-crack mb-3" style="font-size: 2rem; color: #cbd5e1;"></i>
+            <p class="m-0">No property listings found.</p>
+        </div>
+    }
+    else
+    {
+        <div class="property-grid">
+            @foreach (var item in Model)
+            {
+                // Try to get original property image
+                var firstImage = item.ProperyImages?.FirstOrDefault();
+                string bgImage = firstImage != null && !string.IsNullOrEmpty(firstImage.ImagePath) 
+                    ? firstImage.ImagePath 
+                    : "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+
+                <div class="property-card" data-status="@item.Status" data-price="@item.Price" data-date="@item.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ss")" data-title="@item.Title.ToLower()">
+                    <!-- Image Header -->
+                    <div class="property-image-header" style="background-image: url('@bgImage');">
+                        @if (item.Status == "Pending")
+                        {
+                            <span class="badge-status badge-pending"><i class="fa-solid fa-clock me-1"></i> Pending</span>
+                        }
+                        else if (item.Status == "EditPending")
+                        {
+                            <span class="badge-status badge-edit-pending"><i class="fa-solid fa-pen-to-square me-1"></i> Edit Pending</span>
+                        }
+                        else if (item.Status == "DeleteRequested")
+                        {
+                            <span class="badge-status badge-delete-requested"><i class="fa-solid fa-trash me-1"></i> Delete Request</span>
+                        }
+                        else if (item.Status == "Approved")
+                        {
+                            <span class="badge-status badge-approved"><i class="fa-solid fa-check me-1"></i> Approved</span>
+                        }
+                        else if (item.Status == "Rejected")
+                        {
+                            <span class="badge-status badge-rejected"><i class="fa-solid fa-xmark me-1"></i> Rejected</span>
+                        }
+                        else if (item.Status == "Sold")
+                        {
+                            <span class="badge-status badge-sold"><i class="fa-solid fa-tag me-1"></i> Sold</span>
+                        }
+                        else
+                        {
+                            <span class="badge-status">@item.Status</span>
+                        }
+
+                        <h3 class="property-price">₹ @item.Price.ToString("N0")</h3>
+                    </div>
+                    
+                    <!-- Card Body -->
+                    <!-- Card Body -->
+                    <div class="property-body">
+                        <div class="property-type">@item.PropertyType • @item.Category.CategoryName</div>
+                        <h4 class="property-title">@item.Title</h4>
+                        <div class="property-address">
+                            <i class="fa-solid fa-location-dot mt-1"></i> 
+                            <span>@item.Address, @item.City.CityName</span>
+                        </div>
+
+                        <!-- Additional Property Metadata -->
+                        <div class="property-meta-row mb-3" style="display: flex; gap: 14px; font-size: 0.785rem; color: #64748b; flex-wrap: wrap; border-top: 1px dashed #f1f5f9; padding-top: 10px;">
+                            <span title="Furnishing Status"><i class="fa-solid fa-couch text-primary me-1"></i> @item.Furnishing</span>
+                            <span title="Pincode"><i class="fa-solid fa-map-pin text-primary me-1"></i> Pin: @item.Pincode</span>
+                            <span title="Listed Date"><i class="fa-solid fa-calendar-days text-primary me-1"></i> @item.CreatedAt.ToString("dd MMM yyyy")</span>
+                            @if (!string.IsNullOrEmpty(item.VideoUrl))
+                            {
+                                <span class="badge bg-danger text-white d-inline-flex align-items-center gap-1" style="font-size: 0.65rem; border-radius: 12px; padding: 3px 8px;" title="Property has Video"><i class="fa-solid fa-video"></i> Has Video</span>
+                            }
+                        </div>
+
+                        <!-- Seller / Poster Info Box -->
+                        <div class="seller-info-box mb-3 p-2" style="background: #f8fafc; border-radius: 12px; border: 1px solid #edf2f7; display: flex; align-items: center; gap: 12px;">
+                            @{
+                                var userProfileImage = string.IsNullOrEmpty(item.User?.ProfileImage) 
+                                    ? "/images/profile/default.png" 
+                                    : item.User.ProfileImage;
+                            }
+                            <img src="@Url.Content(userProfileImage)" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);" alt="Seller" />
+                            <div style="flex-grow: 1; min-width: 0;">
+                                <div style="font-size: 0.8rem; font-weight: 700; color: #1e293b; line-height: 1.2;">@item.User?.FullName</div>
+                                <div style="font-size: 0.725rem; color: #64748b; line-height: 1.2;" class="text-truncate" title="@item.User?.Email">@item.User?.Email</div>
+                                <div style="font-size: 0.725rem; color: #64748b; line-height: 1.2;"><i class="fa-solid fa-phone me-1" style="font-size: 0.65rem;"></i>@item.User?.Phone</div>
+                            </div>
+                            <span style="background-color: #e2e8f0; color: #475569; font-size: 0.625rem; font-weight: 700; text-transform: uppercase; padding: 2px 6px; border-radius: 8px;">@item.User?.Role</span>
+                        </div>
+
+                        <div class="property-amenities">
+                            <div class="amenity-item" title="Bedrooms">
+                                <i class="fa-solid fa-bed"></i> @item.Bedroom Beds
+                            </div>
+                            <div class="amenity-item" title="Bathrooms">
+                                <i class="fa-solid fa-bath"></i> @item.Bathrooms Baths
+                            </div>
+                            <div class="amenity-item" title="Square Feet">
+                                <i class="fa-solid fa-ruler-combined"></i> @item.AreaSqft sqft
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="property-actions">
+                        @if (item.Status == "Sold")
+                        {
+                            <div class="w-100 text-center py-2 text-muted fw-medium" style="font-size: 0.875rem;">
+                                <i class="fa-solid fa-circle-check text-success me-1"></i> Deal Completed & Sold
+                            </div>
+                        }
+                        else if (item.Status == "DeleteRequested")
+                        {
+                            <a asp-action="ApproveDelete" asp-route-id="@item.ProperyId" class="btn-action text-danger fw-bold" onclick="return confirm('Confirm and approve deleting this property?');" title="Approve Delete">
+                                <i class="fa-solid fa-trash me-1"></i> Approve Delete
+                            </a>
+                            <a asp-action="RejectDelete" asp-route-id="@item.ProperyId" class="btn-action text-secondary" title="Reject Delete">
+                                <i class="fa-solid fa-rotate-left me-1"></i> Reject Delete
+                            </a>
+                        }
+                        else if (item.Status == "EditPending")
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.ProperyId" class="btn-action" title="Review & Edit">
+                                <i class="fa-solid fa-pen me-1"></i> Review Edit
+                            </a>
+                            <a asp-action="ApproveEdit" asp-route-id="@item.ProperyId" class="btn-action text-success" title="Approve Edit">
+                                <i class="fa-solid fa-check me-1"></i> Approve
+                            </a>
+                            <a asp-action="RejectEdit" asp-route-id="@item.ProperyId" class="btn-action text-danger" title="Reject Edit">
+                                <i class="fa-solid fa-xmark me-1"></i> Reject
+                            </a>
+                        }
+                        else
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.ProperyId" class="btn-action" title="Edit Listing">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+                            @if (item.Status == "Pending")
+                            {
+                                <a asp-action="Approve" asp-route-id="@item.ProperyId" class="btn-action text-success" title="Approve">
+                                    <i class="fa-solid fa-check"></i>
+                                </a>
+                                <a asp-action="Reject" asp-route-id="@item.ProperyId" class="btn-action text-danger" title="Reject">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </a>
+                            }
+                            <a asp-action="Delete" asp-route-id="@item.ProperyId" class="btn-action text-danger" onclick="return confirm('Delete this property listing?');" title="Delete">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const tabs = document.querySelectorAll(".status-tab");
+        const cards = Array.from(document.querySelectorAll(".property-card"));
+        const grid = document.querySelector(".property-grid");
+        const sortBySelect = document.getElementById("sortBySelect");
+
+        // Compute counts
+        const counts = {
+            all: cards.length,
+            Pending: 0,
+            EditPending: 0,
+            DeleteRequested: 0,
+            Approved: 0,
+            Rejected: 0,
+            Sold: 0
+        };
+
+        cards.forEach(card => {
+            const status = card.getAttribute("data-status");
+            if (counts[status] !== undefined) {
+                counts[status]++;
+            }
+        });
+
+        // Update count badges
+        document.getElementById("count-all").innerText = counts.all;
+        document.getElementById("count-pending").innerText = counts.Pending;
+        document.getElementById("count-edit-pending").innerText = counts.EditPending;
+        document.getElementById("count-delete-requested").innerText = counts.DeleteRequested;
+        document.getElementById("count-approved").innerText = counts.Approved;
+        document.getElementById("count-rejected").innerText = counts.Rejected;
+        document.getElementById("count-sold").innerText = counts.Sold;
+
+        // Current filter and sort state
+        let currentFilter = "all";
+
+        function filterAndSort() {
+            // 1. FILTER
+            const visibleCards = [];
+            const hiddenCards = [];
+
+            cards.forEach(card => {
+                const status = card.getAttribute("data-status");
+                if (currentFilter === "all" || status === currentFilter) {
+                    visibleCards.push(card);
+                } else {
+                    hiddenCards.push(card);
+                }
+            });
+
+            // 2. SORT VISIBLE CARDS
+            const sortBy = sortBySelect.value;
+            visibleCards.sort((a, b) => {
+                if (sortBy === "price-asc") {
+                    return parseFloat(a.getAttribute("data-price")) - parseFloat(b.getAttribute("data-price"));
+                } else if (sortBy === "price-desc") {
+                    return parseFloat(b.getAttribute("data-price")) - parseFloat(a.getAttribute("data-price"));
+                } else if (sortBy === "newest") {
+                    return new Date(b.getAttribute("data-date")) - new Date(a.getAttribute("data-date"));
+                } else if (sortBy === "title-asc") {
+                    return a.getAttribute("data-title").localeCompare(b.getAttribute("data-title"));
+                } else if (sortBy === "status-priority") {
+                    const getPriority = (status) => {
+                        switch (status) {
+                            case "Pending": return 1;
+                            case "EditPending": return 2;
+                            case "DeleteRequested": return 3;
+                            case "Approved": return 4;
+                            case "Sold": return 5;
+                            case "Rejected": return 6;
+                            default: return 7;
+                        }
+                    };
+                    const pA = getPriority(a.getAttribute("data-status"));
+                    const pB = getPriority(b.getAttribute("data-status"));
+                    if (pA !== pB) return pA - pB;
+                    // secondary sort by date
+                    return new Date(b.getAttribute("data-date")) - new Date(a.getAttribute("data-date"));
+                }
+                return 0;
+            });
+
+            // Apply smooth transition
+            cards.forEach(card => {
+                card.style.transition = "all 0.25s ease";
+                card.style.opacity = "0";
+                card.style.transform = "scale(0.95)";
+            });
+
+            setTimeout(() => {
+                // Clear grid and append sorted visible cards
+                grid.innerHTML = "";
+                
+                if (visibleCards.length === 0) {
+                    const statusName = currentFilter === "all" ? "any" : currentFilter;
+                    grid.innerHTML = `
+                        <div class="w-100 text-center py-5 text-muted" style="grid-column: 1 / -1;">
+                            <i class="fa-solid fa-house-circle-exclamation mb-3" style="font-size: 2.5rem; color: #cbd5e1;"></i>
+                            <p class="m-0 fw-medium">No properties found with status "${statusName}".</p>
+                        </div>
+                    `;
+                } else {
+                    visibleCards.forEach(card => {
+                        card.style.display = "flex";
+                        grid.appendChild(card);
+                    });
+                }
+
+                // Force layout reflow
+                grid.offsetHeight;
+
+                // Fade back in
+                visibleCards.forEach(card => {
+                    card.style.opacity = "1";
+                    card.style.transform = "scale(1)";
+                });
+            }, 200);
+        }
+
+        // Tab click handlers
+        tabs.forEach(tab => {
+            tab.addEventListener("click", function () {
+                tabs.forEach(t => t.classList.remove("active"));
+                this.classList.add("active");
+                currentFilter = this.getAttribute("data-status");
+                filterAndSort();
+            });
+        });
+
+        // Sort change handler
+        sortBySelect.addEventListener("change", filterAndSort);
+
+        // Initial setup
+        filterAndSort();
+    });
+</script>

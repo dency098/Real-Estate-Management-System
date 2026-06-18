@@ -1,0 +1,924 @@
+@model List<RealEstateProject.Models.Property>
+
+@{
+    Layout = null;
+    ViewData["Title"] = "My Properties";
+}
+@using Microsoft.AspNetCore.Http
+
+@{
+    var fullName = Context.Session.GetString("FullName");
+
+    var userImage = Context.Session.GetString("UserImage");
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - RealEstateProject</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+
+        :root {
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
+            --sidebar-bg: #0f172a;
+            --bg: #f4f7fb;
+            --card: #ffffff;
+            --text: #111827;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            font-family: 'Poppins',sans-serif;
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .dashboard-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===================================
+           SIDEBAR
+        =================================== */
+
+        .sidebar {
+            width: 240px;
+            background: #0f172a;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            padding: 18px 14px;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: .3s;
+        }
+
+        /* BRAND */
+
+        .brand-box {
+            text-align: center;
+            padding-bottom: 18px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+        }
+
+            .brand-box img {
+                width: 120px;
+                object-fit: contain;
+                filter: brightness(0) invert(1);
+            }
+
+        /* USER */
+
+        .user-mini {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 16px;
+            background: rgba(255,255,255,.04);
+            margin-bottom: 22px;
+        }
+
+            .user-mini img {
+                width: 46px;
+                height: 46px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 2px solid rgba(255,255,255,.15);
+            }
+
+            .user-mini h6 {
+                color: #fff;
+                font-size: 14px;
+                font-weight: 700;
+                margin-bottom: 2px;
+            }
+
+            .user-mini p {
+                color: #94a3b8;
+                font-size: 11px;
+                margin: 0;
+            }
+
+        /* NAVIGATION */
+
+        .nav-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+            .nav-links li {
+                margin-bottom: 6px;
+            }
+
+                .nav-links li a {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    color: #94a3b8;
+                    text-decoration: none;
+                    padding: 11px 14px;
+                    border-radius: 14px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    transition: .25s;
+                }
+
+                    .nav-links li a i {
+                        width: 18px;
+                        font-size: 15px;
+                    }
+
+                    /* HOVER */
+
+                    .nav-links li a:hover {
+                        background: rgba(255,255,255,.06);
+                        color: #fff;
+                        transform: translateX(3px);
+                    }
+
+                /* ACTIVE */
+
+                .nav-links li.active a {
+                    background: #2563eb;
+                    color: #fff;
+                    box-shadow: 0 8px 20px rgba(37,99,235,.25);
+                }
+
+        /* LOGOUT */
+
+        .logout-link {
+            margin-top: 22px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,.06);
+        }
+
+            .logout-link a {
+                color: #f87171 !important;
+            }
+
+                .logout-link a:hover {
+                    background: rgba(248,113,113,.12) !important;
+                }
+
+        /* MAIN CONTENT FIX */
+
+        .main-content {
+            margin-left: 240px;
+            width: calc(100% - 240px);
+            transition: .3s;
+        }
+
+        /* RESPONSIVE */
+
+        @@media(max-width:992px) {
+
+            .sidebar {
+                width: 82px;
+                padding: 16px 10px;
+            }
+
+            .brand-box img {
+                width: 42px;
+            }
+
+            .user-mini {
+                justify-content: center;
+                padding: 10px;
+            }
+
+                .user-mini div {
+                    display: none;
+                }
+
+            .nav-links li a {
+                justify-content: center;
+                padding: 12px;
+            }
+
+                .nav-links li a span {
+                    display: none;
+                }
+
+            .main-content {
+                margin-left: 82px;
+                width: calc(100% - 82px);
+            }
+        }
+
+        @@media(max-width:768px) {
+
+            .sidebar {
+                width: 72px;
+            }
+
+            .main-content {
+                margin-left: 72px;
+                width: calc(100% - 72px);
+            }
+        }
+
+        /* MAIN */
+
+        .main-content {
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            padding: 28px;
+        }
+
+        /* TOP */
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+            .topbar h2 {
+                font-size: 26px;
+                font-weight: 700;
+                margin-bottom: 4px;
+            }
+
+            .topbar p {
+                color: var(--muted);
+                font-size: 14px;
+                margin: 0;
+            }
+
+        .add-btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            height: 46px;
+            padding: 0 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+
+            .add-btn:hover {
+                background: #1d4ed8;
+                color: #fff;
+            }
+
+        /* STATS */
+
+        .stats-row {
+            margin-bottom: 22px;
+        }
+
+        .mini-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 22px;
+            height: 100%;
+            transition: 0.3s;
+        }
+
+            .mini-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            }
+
+        .mini-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .mini-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .blue {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .green {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .orange {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .mini-card h3 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .mini-card span {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        /* TABLE CARD */
+
+        .table-card {
+            background: #fff;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+            .table-header h4 {
+                font-size: 18px;
+                font-weight: 600;
+                margin: 0;
+            }
+
+        .search-box {
+            position: relative;
+        }
+
+            .search-box input {
+                height: 42px;
+                width: 240px;
+                border-radius: 10px;
+                border: 1px solid var(--border);
+                padding: 0 14px 0 40px;
+                font-size: 14px;
+                outline: none;
+            }
+
+            .search-box i {
+                position: absolute;
+                left: 14px;
+                top: 13px;
+                color: #9ca3af;
+                font-size: 13px;
+            }
+
+        /* TABLE */
+
+        .table {
+            margin: 0;
+            vertical-align: middle;
+        }
+
+            .table thead th {
+                background: #f9fafb;
+                color: #6b7280;
+                font-size: 12px;
+                font-weight: 600;
+                padding: 16px 22px;
+                border: none;
+                text-transform: uppercase;
+                letter-spacing: .5px;
+            }
+
+            .table tbody td {
+                padding: 18px 22px;
+                border-color: #f1f5f9;
+            }
+
+        .property-box {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+            .property-box img {
+                width: 72px;
+                height: 58px;
+                border-radius: 12px;
+                object-fit: cover;
+            }
+
+            .property-box h6 {
+                margin: 0;
+                font-size: 14px;
+                font-weight: 600;
+            }
+
+            .property-box p {
+                margin: 4px 0 0;
+                font-size: 12px;
+                color: var(--muted);
+            }
+
+        .status {
+            padding: 7px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .status::before {
+                content: '';
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: currentColor;
+            }
+
+        .approved {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .price {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* ACTION BUTTONS */
+
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-small {
+            width: 38px;
+            height: 38px;
+            border: none;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-edit {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+            .btn-edit:hover {
+                background: #2563eb;
+                color: #fff;
+            }
+
+        .btn-delete {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+
+            .btn-delete:hover {
+                background: #ef4444;
+                color: #fff;
+            }
+
+        /* EMPTY */
+
+        .empty-box {
+            text-align: center;
+            padding: 70px 20px;
+        }
+
+            .empty-box i {
+                font-size: 48px;
+                color: #cbd5e1;
+                margin-bottom: 18px;
+            }
+
+            .empty-box h5 {
+                font-size: 18px;
+                font-weight: 600;
+                margin-bottom: 6px;
+            }
+
+            .empty-box p {
+                color: var(--muted);
+                font-size: 14px;
+            }
+
+        /* RESPONSIVE */
+
+        @@media(max-width:992px) {
+
+            .sidebar-menu-dashboard {
+                width: 90px;
+                padding: 20px 10px;
+            }
+
+            .logo-box img {
+                width: 45px;
+            }
+
+            .nav-menu-link {
+                justify-content: center;
+            }
+
+                .nav-menu-link span {
+                    display: none;
+                }
+
+            .main-content {
+                margin-left: 90px;
+                width: calc(100% - 90px);
+            }
+        }
+
+        @@media(max-width:768px) {
+
+            .main-content {
+                padding: 18px;
+            }
+
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-box input {
+                width: 100%;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="dashboard-wrapper">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="brand-box">
+                <img src="@Url.Content("~/images/logo/logo-footer@2x.png")" />
+            </div>
+
+            <div class="user-mini">
+
+                <img src="@Url.Content(userImage ?? "~/images/profile/default.png")" />
+
+                <h6>@fullName</h6>
+
+            </div>
+
+            <ul class="nav-links">
+
+                <li>
+                    <a asp-controller="User" asp-action="Index">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Home</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="User" asp-action="Dashboard">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+
+                <li class="active">
+                    <a asp-controller="User" asp-action="Profile">
+                        <i class="fa-solid fa-user"></i>
+                        <span>My Profile</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="User" asp-action="MyProperties">
+                        <i class="fa-solid fa-building"></i>
+                        <span>My Properties</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="User" asp-action="MyEnquiries">
+                        <i class="fa-solid fa-handshake"></i>
+                        <span>Property Deals</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="User" asp-action="Property">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Add Property</span>
+                    </a>
+                </li>
+
+                <li class="logout-link">
+                    <a asp-controller="Account"
+                       asp-action="Logout"
+                       onclick="return confirm('Logout?');">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>Logout</span>
+                    </a>
+                </li>
+
+            </ul>
+
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main-content">
+
+            <!-- TOPBAR -->
+
+            <div class="topbar">
+
+                <div>
+                    <h2>My Properties</h2>
+                    <p>Manage all your listed properties easily.</p>
+                </div>
+
+                <a asp-controller="User"
+                   asp-action="Property"
+                   class="add-btn">
+
+                    <i class="fa-solid fa-plus"></i>
+                    Add Property
+
+                </a>
+
+            </div>
+
+            <!-- STATS -->
+
+            <div class="row stats-row g-3">
+
+                <div class="col-md-4">
+
+                    <div class="mini-card">
+
+                        <div class="mini-top">
+                            <div class="mini-icon blue">
+                                <i class="fa-solid fa-building"></i>
+                            </div>
+                        </div>
+
+                        <h3>@Model.Count()</h3>
+                        <span>Total Listings</span>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="mini-card">
+
+                        <div class="mini-top">
+                            <div class="mini-icon green">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </div>
+                        </div>
+
+                        <h3>@Model.Count(x => x.Status == "Approved")</h3>
+                        <span>Approved Properties</span>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="mini-card">
+
+                        <div class="mini-top">
+                            <div class="mini-icon orange">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                        </div>
+
+                        <h3>@Model.Count(x => x.Status == "Pending")</h3>
+                        <span>Pending Review</span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- TABLE -->
+
+            <div class="table-card">
+
+                <div class="table-header">
+
+                    <h4>Property Listings</h4>
+
+                    <div class="search-box">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" placeholder="Search property..." />
+                    </div>
+
+                </div>
+
+                <div class="table-responsive">
+
+                    <table class="table">
+
+                        <thead>
+
+                            <tr>
+                                <th>Property</th>
+                                <th>Status</th>
+                                <th>Price</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var item in Model)
+                                {
+                                    var img = (item.ProperyImages != null && item.ProperyImages.Any())
+                                    ? item.ProperyImages.First().ImagePath
+                                    : "~/images/default.jpg";
+
+                                    <tr>
+
+                                        <td>
+
+                                            <div class="property-box">
+
+                                                <img src="@Url.Content(img)" />
+
+                                                <div>
+                                                    <h6>@item.Title</h6>
+
+                                                    <p>
+                                                        <i class="fa-solid fa-location-dot me-1"></i>
+                                                        @(item.City?.CityName ?? "Location")
+                                                    </p>
+                                                </div>
+
+                                            </div>
+
+                                        </td>
+
+                                        <td>
+
+                                            @if (item.Status == "Approved")
+                                            {
+                                                <span class="status approved">Approved</span>
+                                            }
+                                            else if (item.Status == "Pending" || item.Status == "EditPending")
+                                            {
+                                                <span class="status pending">Pending</span>
+                                            }
+                                            else if (item.Status == "Sold")
+                                            {
+                                                <span class="status approved">Sold</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="status rejected">@item.Status</span>
+                                            }
+
+                                        </td>
+
+                                        <td>
+                                            <span class="price">
+                                                ₹ @item.Price.ToString("N0")
+                                            </span>
+                                        </td>
+
+                                        <td>
+
+                                            @if (item.Status != "Rejected" && item.Status != "Sold")
+                                            {
+                                                <div class="action-buttons">
+
+                                                    <a class="btn-small btn-edit"
+                                                       asp-action="EditProperty"
+                                                       asp-route-id="@item.ProperyId">
+
+                                                        <i class="fa-solid fa-pen"></i>
+
+                                                    </a>
+
+                                                    <a class="btn-small btn-delete"
+                                                       asp-controller="User"
+                                                       asp-action="RequestDelete"
+                                                       asp-route-id="@item.ProperyId"
+                                                       onclick="return confirm('Delete request?');">
+
+                                                        <i class="fa-solid fa-trash"></i>
+
+                                                    </a>
+
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted fw-semibold">
+                                                    No Actions
+                                                </span>
+                                            }
+
+                                        </td>
+
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+
+                                    <td colspan="4">
+
+                                        <div class="empty-box">
+
+                                            <i class="fa-solid fa-folder-open"></i>
+
+                                            <h5>No Properties Found</h5>
+
+                                            <p>
+                                                Start by adding your first property listing.
+                                            </p>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

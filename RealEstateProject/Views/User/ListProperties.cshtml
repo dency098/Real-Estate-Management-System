@@ -1,0 +1,516 @@
+@model List<RealEstateProject.Models.Property>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+
+<style>
+    body {
+        background: linear-gradient(135deg, #eef2f7, #d9e4f5);
+    }
+
+    .header h2 {
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .btn-custom {
+        border-radius: 30px;
+        padding: 6px 18px;
+        font-size: 14px;
+    }
+
+    /* CARD */
+    .property-card {
+        border-radius: 20px;
+        overflow: hidden;
+        background: #fff;
+        transition: 0.4s;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        position: relative;
+    }
+
+        .property-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+
+    /* IMAGE */
+    .img-box {
+        position: relative;
+        height: 230px;
+        overflow: hidden;
+    }
+
+        .img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.5s;
+        }
+
+    .property-card:hover img {
+        transform: scale(1.1);
+    }
+
+    /* DARK OVERLAY */
+    .overlay {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1));
+    }
+
+    /* BADGE */
+    .badge-type {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background: rgba(255,255,255,0.2);
+        backdrop-filter: blur(6px);
+        color: #fff;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+
+    /* PRICE */
+    .price-tag {
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+        background: #ffffff;
+        color: #111;
+        padding: 6px 12px;
+        border-radius: 12px;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    /* CARD BODY */
+    .card-body {
+        padding: 16px;
+    }
+
+    .title {
+        font-size: 17px;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .location {
+        font-size: 13px;
+        color: #64748b;
+        margin-top: 4px;
+    }
+
+    .user {
+        font-size: 12px;
+        color: #94a3b8;
+    }
+
+    /* BUTTON */
+    .btn-view {
+        display: block;
+        margin-top: 12px;
+        text-align: center;
+        background: linear-gradient(45deg, #4f46e5, #3b82f6);
+        color: white;
+        padding: 7px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-size: 13px;
+        transition: 0.3s;
+    }
+
+        .btn-view:hover {
+            background: linear-gradient(45deg, #4338ca, #2563eb);
+            color: white;
+        }
+</style>
+
+<div class="container mt-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4 header">
+        <h2>🏡 Find Your Dream Property</h2>
+
+    </div>
+
+    <!-- CARDS -->
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="property-card">
+
+                    <div class="img-box">
+                        <img src="@(item.ProperyImages != null && item.ProperyImages.Any()
+                                                                                                              ? item.ProperyImages.First().ImagePath
+                                                                                                              : "/images/default.jpg")" />
+
+                        <div class="overlay"></div>
+
+                        <div class="badge-type">
+                            @item.PropertyType
+                        </div>
+
+                        <div class="price-tag">
+                            ₹ @item.Price
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="title">@item.Title</div>
+
+                        <div class="location">
+                            <i class="fa fa-location-dot"></i>
+                            @(item.City?.CityName ?? "No City")
+                        </div>
+
+                        <div class="user">
+                            <i class="fa fa-user"></i>
+                            @(item.User?.FullName ?? "Unknown")
+                        </div>
+
+                        <a asp-controller="User" asp-action="ViewProperty" asp-route-id="@item.ProperyId" class="btn-sm-custom btn-view">
+                            View
+                        </a>
+
+                    </div>
+
+                </div>
+            </div>
+        }
+    </div>
+
+</div>@* @model List<RealEstateProject.Models.Property>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+<style>
+    body {
+        background: linear-gradient(120deg, #eef2f7, #e3ebf6);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .property-card {
+        border-radius: 18px;
+        overflow: hidden;
+        background: #fff;
+        transition: 0.4s;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+        .property-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+    .img-box {
+        position: relative;
+        height: 220px;
+        overflow: hidden;
+    }
+
+        .img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.5s;
+        }
+
+    .property-card:hover img {
+        transform: scale(1.1);
+    }
+
+    .badge-type {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background: linear-gradient(45deg, #ff416c, #ff4b2b);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+
+    .card-body {
+        padding: 15px;
+    }
+
+    .price {
+        font-size: 20px;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+
+    .title {
+        font-size: 16px;
+        margin-top: 5px;
+        font-weight: 600;
+    }
+
+    .location {
+        font-size: 13px;
+        color: gray;
+    }
+
+    .user {
+        font-size: 12px;
+        color: #555;
+        margin-top: 3px;
+    }
+
+    .btn-view {
+        display: inline-block;
+        margin-top: 10px;
+        background: #4e73df;
+        color: white;
+        padding: 6px 14px;
+        border-radius: 10px;
+        font-size: 13px;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+        .btn-view:hover {
+            background: #224abe;
+            color: white;
+        }
+
+    .top-bar a {
+        border-radius: 10px;
+        padding: 6px 14px;
+        font-weight: 500;
+    }
+</style>
+
+<div class="container mt-5">
+
+    <!-- Top Bar -->
+    <div class="d-flex justify-content-between align-items-center mb-4 top-bar">
+        <h3 class="fw-bold">🏡 Properties</h3>
+
+        <div>
+            <a asp-controller="User" asp-action="AddProperty" class="btn btn-primary">
+                + Add Property
+            </a>
+
+            <a asp-controller="User" asp-action="MyProperties" class="btn btn-dark">
+                My Properties
+            </a>
+        </div>
+    </div>
+
+    <!-- Property List -->
+    <div class="row">
+        @foreach (var item in Model)
+        { *@
+@* <div class="col-md-4 mb-4">
+                <div class="property-card">
+
+                    <!-- Image -->
+                    <div class="img-box">
+                        
+                        <img src="@(item.ProperyImages.FirstOrDefault()?.ImagePath ?? "/images/default.jpg")" />
+
+                        <div class="badge-type">
+                            @item.PropertyType
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="card-body">
+                        <div class="price">₹ @item.Price</div>
+                        <div class="title">@item.Title</div>
+                        <div class="location">📍 @item.City.CityName</div>
+                        <div class="user">👤 @item.User.FullName</div>
+
+                        <a href="#" class="btn-view">View Details</a>
+                    </div>
+
+                </div>
+            </div> *@
+@* 
+            <div class="img-box">
+                <img src="@(item.ProperyImages != null && item.ProperyImages.Any()
+                             ? item.ProperyImages.First().ImagePath
+                             : "/images/default.jpg")" />
+
+            <div class="badge-type">
+                @item.PropertyType
+            </div>
+        </div>
+
+            <div class="card-body">
+                <div class="price">₹ @item.Price</div>
+                <div class="title">@item.Title</div>
+                <div class="location">📍 @(item.City?.CityName ?? "No City")</div>
+                <div class="user">👤 @(item.User?.FullName ?? "Unknown User")</div>
+
+                <a href="#" class="btn-view">View Details</a>
+            </div>
+        }
+    </div>
+
+</div> *@
+@* @model List<RealEstateProject.Models.Property>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+<style>
+    body {
+        background: #f4f7fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .property-card {
+        border-radius: 20px;
+        overflow: hidden;
+        position: relative;
+        height: 300px;
+        color: white;
+        transition: transform 0.3s, box-shadow 0.3s;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        cursor: pointer;
+        background-color: #fff;
+    }
+
+        .property-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+        }
+
+    .property-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: brightness(0.75);
+        transition: filter 0.3s;
+    }
+
+    .property-card:hover .property-img {
+        filter: brightness(0.6);
+    }
+
+    /* Overlay for text readability */
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1));
+        border-radius: 20px;
+    }
+
+    /* Top badge */
+    .badge-type {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background: #ff6b6b;
+        color: white;
+        padding: 6px 14px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Bottom content */
+    .card-content {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        z-index: 2;
+    }
+
+    .price {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .title {
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 3px;
+    }
+
+    .location {
+        font-size: 13px;
+        opacity: 0.85;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* Rounded button for "View Details" */
+    .view-btn {
+        margin-top: 10px;
+        background: #1e90ff;
+        color: white;
+        padding: 5px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: background 0.3s;
+    }
+
+        .view-btn:hover {
+            background: #0b68c1;
+            color: white;
+        }
+</style>
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold">Properties</h3>
+
+        <a asp-controller="User" asp-action="AddProperty" class="btn add-btn">
+            + Add Property
+        </a>
+        <a asp-controller="User" asp-action="MyProperties" class="btn add-btn">
+            MyProperties
+        </a>
+    </div>
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="property-card">
+
+                    <!-- Image -->
+                    <img src="https://via.placeholder.com/500x300"
+                         class="property-img" />
+
+                    <!-- Overlay -->
+                    <div class="overlay"></div>
+
+                    <!-- Badge -->
+                    <div class="badge-type">
+                        @item.PropertyType
+                    </div>
+
+                    <!-- Bottom Content -->
+                    <div class="card-content">
+                        <div class="price">₹ @item.Price</div>
+                        <div class="title">@item.Title</div>
+                        <div class="location">📍 @item.City.CityName</div>
+                        <!-- 👇 ADD THIS -->
+                        <div style="font-size:12px; opacity:0.8;">
+                            👤 @item.User.FullName
+                        </div>
+                        <a href="#" class="view-btn">View Details</a>
+                    </div>
+
+                </div>
+            </div>
+        }
+    </div>
+</div> *@

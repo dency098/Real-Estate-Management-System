@@ -1,0 +1,290 @@
+@model RealEstateProject.Models.LoginModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = null; // Important: remove default _Layout
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - RealEstate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --bg-color: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .split-layout {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* Image Side */
+        .image-side {
+            flex: 1;
+            background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2075&q=80');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            display: none; /* Mobile hidden */
+        }
+
+        .image-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(15, 23, 42, 0.2), rgba(15, 23, 42, 0.8));
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 60px;
+            color: white;
+        }
+
+        .image-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .image-subtitle {
+            font-size: 1.125rem;
+            color: #cbd5e1;
+            max-width: 400px;
+            line-height: 1.6;
+        }
+
+        /* Form Side */
+        .form-side {
+            flex: 1;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 40px;
+            background: white;
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.05);
+            z-index: 10;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 40px;
+        }
+
+        .logo i {
+            font-size: 1.75rem;
+        }
+
+        .page-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .page-subtitle {
+            font-size: 0.9375rem;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #334155;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 0.9375rem;
+            font-family: inherit;
+            color: var(--text-main);
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .alert-error {
+            background-color: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-success {
+            background-color: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        /* Links */
+        .auth-links {
+            margin-top: 32px;
+            text-align: center;
+            font-size: 0.9375rem;
+            color: var(--text-muted);
+        }
+
+        .auth-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @@media (min-width: 992px) {
+            .image-side {
+                display: block;
+            }
+        }
+        
+        @@media (max-width: 991px) {
+            .form-side {
+                max-width: 100%;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="split-layout">
+        
+        <!-- Image Side -->
+        <div class="image-side">
+            <div class="image-overlay">
+                <h1 class="image-title">Find Your Dream Home.</h1>
+                <p class="image-subtitle">Log in to discover exclusive properties, manage your listings, and connect with top agents.</p>
+            </div>
+        </div>
+
+        <!-- Form Side -->
+        <div class="form-side">
+            <div class="form-container">
+                
+                <a href="/" class="logo">
+                    <i class="fa-solid fa-building"></i> RealEstate
+                </a>
+
+                <h2 class="page-title">Welcome back</h2>
+                <p class="page-subtitle">Please enter your details to sign in.</p>
+
+                @if (ViewBag.Message != null)
+                {
+                    <div class="alert alert-error">@ViewBag.Message</div>
+                }
+
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success">@TempData["Success"]</div>
+                }
+
+                <form asp-action="Login" method="post">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email address</label>
+                        <input asp-for="Email" type="email" class="form-control" placeholder="Enter your email" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input asp-for="Password" type="password" class="form-control" placeholder="Enter your password" required />
+                    </div>
+
+                    <button type="submit" class="btn-submit">Sign in</button>
+
+                </form>
+
+                <div class="auth-links">
+                    Don't have an account? <a asp-action="Register" class="auth-link">Sign up for free</a>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

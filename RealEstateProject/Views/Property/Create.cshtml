@@ -1,0 +1,258 @@
+@model RealEstateProject.Models.Property
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Create Property";
+    ViewData["ActivePage"] = "Property";
+}
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .page-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-main);
+        margin: 0;
+    }
+
+    .page-subtitle {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        margin: 4px 0 0 0;
+    }
+
+    .section-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        padding: 24px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--text-main);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        display: block;
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 0.875rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: var(--text-main);
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    }
+
+    textarea.form-control {
+        min-height: 100px;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #2563eb;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+    }
+
+    .btn-primary-action {
+        background: #2563eb;
+        border: 1px solid #2563eb;
+        color: #ffffff;
+        padding: 8px 20px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .btn-primary-action:hover {
+        background: #1d4ed8;
+        border-color: #1d4ed8;
+    }
+
+    .btn-secondary-action {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        color: #0f172a;
+        padding: 8px 20px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: 0.2s;
+    }
+
+    .btn-secondary-action:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+        color: #0f172a;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0 24px;
+    }
+
+    @@media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="container-fluid p-0">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Add Property</h1>
+            <p class="page-subtitle">Create a new property listing.</p>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <form asp-action="Create" method="post">
+            <div class="form-group">
+                <label asp-for="Title" class="form-label">Property Title</label>
+                <input asp-for="Title" class="form-control" placeholder="e.g. Modern Apartment in Downtown" />
+                <span asp-validation-for="Title" class="text-danger small mt-1 d-block"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Description" class="form-label">Description</label>
+                <textarea asp-for="Description" class="form-control" placeholder="Detailed property description"></textarea>
+                <span asp-validation-for="Description" class="text-danger small mt-1 d-block"></span>
+            </div>
+
+            <div class="form-grid border-top pt-4 mt-2">
+                <div class="form-group">
+                    <label asp-for="Price" class="form-label">Price (₹)</label>
+                    <input asp-for="Price" class="form-control" />
+                    <span asp-validation-for="Price" class="text-danger small mt-1 d-block"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="CategoryId" class="form-label">Category</label>
+                    <select asp-for="CategoryId" class="form-select">
+                        <option value="">Select Category</option>
+                        @if(ViewBag.Categories != null) {
+                            foreach (var c in ViewBag.Categories)
+                            {
+                                <option value="@c.CategoryId">@c.CategoryName</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger small mt-1 d-block"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">State</label>
+                    <select id="stateDropdown" class="form-select">
+                        <option value="">Select State</option>
+                        @if(ViewBag.States != null) {
+                            foreach (var state in ViewBag.States)
+                            {
+                                <option value="@state.StateId">@state.StateName</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="CityId" class="form-label">City</label>
+                    <select id="cityDropdown" asp-for="CityId" class="form-select">
+                        <option value="">Select City</option>
+                    </select>
+                    <span asp-validation-for="CityId" class="text-danger small mt-1 d-block"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="PropertyType" class="form-label">Property Type</label>
+                    <input asp-for="PropertyType" class="form-control" placeholder="e.g. Sell, Rent" />
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="AreaSqft" class="form-label">Area (SqFt)</label>
+                    <input asp-for="AreaSqft" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Bedroom" class="form-label">Bedrooms</label>
+                    <input asp-for="Bedroom" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Bathrooms" class="form-label">Bathrooms</label>
+                    <input asp-for="Bathrooms" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Furnishing" class="form-label">Furnishing Status</label>
+                    <input asp-for="Furnishing" class="form-control" placeholder="e.g. Fully Furnished" />
+                </div>
+                
+                <div class="form-group">
+                    <label asp-for="Status" class="form-label">Listing Status</label>
+                    <input asp-for="Status" class="form-control" value="Pending" />
+                </div>
+            </div>
+
+            <div class="form-group border-top pt-4">
+                <label asp-for="Address" class="form-label">Street Address</label>
+                <input asp-for="Address" class="form-control" />
+            </div>
+
+            <div class="form-group" style="max-width: 50%;">
+                <label asp-for="Pincode" class="form-label">Pincode</label>
+                <input asp-for="Pincode" class="form-control" />
+            </div>
+
+            <div class="d-flex gap-3 mt-4 pt-4 border-top">
+                <button type="submit" class="btn-primary-action">Save Property</button>
+                <a asp-action="Index" class="btn-secondary-action">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#stateDropdown").change(function () {
+                var stateId = $(this).val();
+                if (stateId) {
+                    $.get('/City/GetCitiesByState', { stateId: stateId }, function (data) {
+                        var cityDropdown = $("#cityDropdown");
+                        cityDropdown.empty();
+                        cityDropdown.append('<option value="">Select City</option>');
+                        $.each(data, function (i, city) {
+                            cityDropdown.append(`<option value="${city.cityId}">${city.cityName}</option>`);
+                        });
+                    });
+                } else {
+                    $("#cityDropdown").empty().append('<option value="">Select City</option>');
+                }
+            });
+        });
+    </script>
+}

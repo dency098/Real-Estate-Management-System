@@ -1,0 +1,594 @@
+@model RealEstateProject.Models.Enquiry
+
+@{
+    ViewData["Title"] = "Process Deal";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+
+    body {
+        overflow-x: hidden;
+        background: #f8fafc;
+    }
+
+    .container-fluid {
+        max-width: 1450px;
+        margin: auto;
+        padding: 12px;
+    }
+
+    /* HEADER */
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e2e8f0;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .page-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin: 0;
+        color: #0f172a;
+    }
+
+    .page-subtitle {
+        margin: 2px 0 0;
+        color: #64748b;
+        font-size: 0.82rem;
+    }
+
+    .deal-price {
+        background: #2563eb;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+
+    /* CARDS */
+
+    .section-card {
+        background: white;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+
+    .card-title {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 14px;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* TIMELINE */
+
+    .timeline {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        position: relative;
+    }
+
+        .timeline::before {
+            content: "";
+            position: absolute;
+            left: 19px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e2e8f0;
+        }
+
+    .timeline-item {
+        position: relative;
+        padding-left: 50px;
+        margin-bottom: 16px;
+    }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+    .timeline-marker {
+        position: absolute;
+        left: 11px;
+        top: 10px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 2px solid #cbd5e1;
+        z-index: 2;
+    }
+
+    .timeline-item.completed .timeline-marker {
+        background: #16a34a;
+        border-color: #16a34a;
+    }
+
+        .timeline-item.completed .timeline-marker::after {
+            content: "✓";
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            position: absolute;
+            top: -1px;
+            left: 3px;
+        }
+
+    .timeline-item.active .timeline-marker {
+        border: 4px solid #2563eb;
+    }
+
+    .timeline-content {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 14px 16px;
+    }
+
+    .timeline-item.active .timeline-content {
+        background: #eff6ff;
+        border-color: #93c5fd;
+    }
+
+    .timeline-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+        color: #0f172a;
+    }
+
+    .timeline-desc {
+        font-size: 0.82rem;
+        color: #64748b;
+        margin-bottom: 10px;
+        line-height: 1.4;
+    }
+
+    /* BADGES */
+
+    .badge-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.72rem;
+        font-weight: 600;
+    }
+
+    .badge-success {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .badge-pending {
+        background: #fef3c7;
+        color: #b45309;
+    }
+
+    /* BUTTONS */
+
+    .btn-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.82rem;
+        font-weight: 600;
+        transition: 0.2s;
+    }
+
+    .btn-primary {
+        background: #2563eb;
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            color: white;
+        }
+
+    .btn-success {
+        background: #16a34a;
+        color: white;
+    }
+
+        .btn-success:hover {
+            background: #15803d;
+            color: white;
+        }
+
+    /* STAKEHOLDER */
+
+    .stakeholder-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+    .stakeholder-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: #dbeafe;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+
+    .stakeholder-role {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        color: #64748b;
+        font-weight: 700;
+    }
+
+    .stakeholder-name {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    /* FINANCE */
+
+    .finance-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px dashed #cbd5e1;
+        font-size: 0.85rem;
+    }
+
+        .finance-row:last-child {
+            border-bottom: none;
+        }
+
+    .finance-total {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 2px solid #e2e8f0;
+        font-weight: 700;
+    }
+
+    /* RIGHT SIDEBAR */
+
+    @@media(min-width:992px) {
+
+        .right-sidebar {
+            position: sticky;
+            top: 20px;
+        }
+    }
+</style>
+
+<div class="container-fluid">
+
+    <!-- HEADER -->
+
+    <div class="page-header">
+
+        <div>
+            <h1 class="page-title">
+                @(Model.Property?.Title ?? "Unknown Property")
+            </h1>
+
+            <p class="page-subtitle">
+                <i class="fa-solid fa-file-contract"></i>
+                Deal Ref: #D-@Model.EnquiryId.ToString("D5")
+            </p>
+        </div>
+
+        <div class="deal-price">
+            ₹ @((Model.PropertyPrice ?? 0).ToString("N0"))
+        </div>
+
+    </div>
+
+    <div class="row g-3">
+
+        <!-- LEFT -->
+
+        <div class="col-lg-8">
+
+            <div class="section-card">
+
+                <h2 class="card-title">
+                    <i class="fa-solid fa-bars-progress"></i>
+                    Deal Progress
+                </h2>
+
+                <ul class="timeline">
+                    <!-- STAGES TIMELINE -->
+                    @if (string.Equals(Model.Property?.PropertyType, "Rent", StringComparison.OrdinalIgnoreCase))
+                    {
+                        <!-- RENT SPECIFIC STAGES (6 STAGES) -->
+                        <li class="timeline-item @(Model.Stage >= 1 ? "completed" : "active")">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">1. Deal Open</div>
+                                <div class="timeline-desc">Admin has approved the enquiry.</div>
+                            </div>
+                        </li>
+                        <li class="timeline-item @(Model.Stage > 2 ? "completed" : (Model.Stage == 2 ? "active" : ""))">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">2. Property Visiting</div>
+                                <div class="timeline-desc">Site visit status: @(Model.VisitStatus ?? "Not Started")</div>
+                            </div>
+                        </li>
+                        <li class="timeline-item @(Model.Stage > 3 ? "completed" : (Model.Stage == 3 ? "active" : ""))">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">3. Start Deal</div>
+                                <div class="timeline-desc">Official deal commencement.</div>
+                            </div>
+                        </li>
+                        <li class="timeline-item @(Model.Stage > 4 ? "completed" : (Model.Stage == 4 ? "active" : ""))">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">4. Document Verification</div>
+                                <div class="timeline-desc">Identity photo verification.</div>
+                                @if (Model.IsDocumentUploaded)
+                                {
+                                    <a href="@Url.Content(Model.DocumentPath)" target="_blank" class="badge-status badge-success mb-2" style="text-decoration:none;"><i class="fa-solid fa-image"></i> View Photo</a>
+                                    @if (Model.Stage == 4) {
+                                        <a href="@Url.Action("CompleteRegistration", "Admin", new { id = Model.EnquiryId })" class="btn-action btn-primary">Approve & Next</a>
+                                    }
+                                }
+                            </div>
+                        </li>
+                        <li class="timeline-item @(Model.Stage > 5 ? "completed" : (Model.Stage == 5 ? "active" : ""))">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">5. Deposit & Rent</div>
+                                <div class="timeline-desc">Security Deposit and First Month Rent.</div>
+                                <div class="d-flex gap-2 mb-2">
+                                    <span class="badge-status @(Model.IsSecurityDepositPaid ? "badge-success" : "badge-pending")">Dep: @(Model.IsSecurityDepositPaid ? "Paid" : "Pending")</span>
+                                    <span class="badge-status @(Model.IsFirstMonthRentPaid ? "badge-success" : "badge-pending")">Rent: @(Model.IsFirstMonthRentPaid ? "Paid" : "Pending")</span>
+                                </div>
+                                @if (Model.Stage == 5 && Model.IsSecurityDepositPaid && Model.IsFirstMonthRentPaid) {
+                                    <a href="@Url.Action("PayCommission", "Admin", new { id = Model.EnquiryId })" class="btn-action btn-primary">Verify & Next</a>
+                                }
+                            </div>
+                        </li>
+                        <li class="timeline-item @(Model.Stage == 6 ? "completed" : "")">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">6. Brokerage & Active Lease</div>
+                                <div class="timeline-desc">Final brokerage settlement.</div>
+                                @if (Model.IsBrokeragePaid) {
+                                    <span class="badge-status badge-success">Brokerage Paid</span>
+                                    @if (Model.Status == "Completed") {
+                                        <div class="mt-3 text-success fw-bold">🏠 Lease Active</div>
+
+                                        @* REMINDER BUTTON - Always visible for active lease *@
+                                        <div class="mt-2 d-flex gap-2 flex-wrap">
+                                            <form asp-controller="Admin" asp-action="SendRentReminder" method="post"><input type="hidden" name="id" value="@Model.EnquiryId" /><button type="submit" class="btn btn-sm btn-warning"><i class="fa-solid fa-bell me-1"></i> Send Rent Reminder</button></form>
+                                        </div>
+
+                                        @* CLOSE DEAL BUTTON - Only visible after tenant requests *@
+                                        @if (Model.IsCloseRentRequested) {
+                                            <div class="mt-3 p-3 border border-danger rounded bg-danger-subtle">
+                                                <div class="fw-bold text-danger mb-2" style="font-size: 13px;"><i class="fa-solid fa-exclamation-triangle me-1"></i> Tenant has requested to close this rent deal</div>
+                                                <form asp-controller="Admin" asp-action="CloseRentDeal" method="post" onsubmit="return confirm('Are you sure you want to close this rent deal? The property will become available for rent again.');">
+                                                    <input type="hidden" name="id" value="@Model.EnquiryId" />
+                                                    <button type="submit" class="btn btn-sm btn-danger w-100"><i class="fa-solid fa-circle-xmark me-1"></i> Close Rent Deal</button>
+                                                </form>
+                                            </div>
+                                        } else {
+                                            <div class="mt-2 text-muted small" style="font-size: 11px;"><i class="fa-solid fa-info-circle me-1"></i> Close Deal button will appear when tenant requests closure.</div>
+                                        }
+                                    }
+                                }
+                                else if (Model.Stage == 6) { <span class="badge-status badge-pending">Pending Brokerage</span> }
+                            </div>
+                        </li>
+                    }
+                    else
+                    {
+                        <!-- SALE SPECIFIC STAGES (7 STAGES) -->
+                        <li class="timeline-item @(Model.Stage >= 1 ? "completed" : "active")">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">1. Deal Open</div>
+                                <div class="timeline-desc">Admin has approved the enquiry.</div>
+                            </div>
+                        </li>
+                        <li class="timeline-item @(Model.Stage > 2 ? "completed" : (Model.Stage == 2 ? "active" : ""))">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">2. Property Visiting</div>
+                                <div class="timeline-desc">Site visit status: @(Model.VisitStatus ?? "Not Started")</div>
+                            </div>
+                        </li>
+                        <li class="timeline-item @(Model.Stage > 3 ? "completed" : (Model.Stage == 3 ? "active" : ""))">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">3. Start Deal</div>
+                                <div class="timeline-desc">Official deal commencement.</div>
+                            </div>
+                        </li>
+                        <li class="timeline-item @(Model.Stage > 4 ? "completed" : (Model.Stage == 4 ? "active" : ""))">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">4. Document Verification</div>
+                                <div class="timeline-desc">Identity photo verification.</div>
+                                @if (Model.IsDocumentUploaded)
+                                {
+                                    <a href="@Url.Content(Model.DocumentPath)" target="_blank" class="badge-status badge-success mb-2" style="text-decoration:none;"><i class="fa-solid fa-image"></i> View Photo</a>
+                                    @if (Model.Stage == 4) {
+                                        <a href="@Url.Action("PayToken", "Admin", new { id = Model.EnquiryId })" class="btn-action btn-primary">Approve & Next</a>
+                                    }
+                                }
+                            </div>
+                        </li>
+                        <li class="timeline-item @(Model.Stage > 5 ? "completed" : (Model.Stage == 5 ? "active" : ""))">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">5. Token Deposit</div>
+                                <div class="timeline-desc">Buyer pays token amount ₹15,000.</div>
+                                <span class="badge-status @(Model.IsTokenPaid ? "badge-success" : "badge-pending")">Token: @(Model.IsTokenPaid ? "Paid" : "Pending")</span>
+                                @if (Model.Stage == 5 && Model.IsTokenPaid) {
+                                    <a href="@Url.Action("CompleteRegistration", "Admin", new { id = Model.EnquiryId })" class="btn-action btn-primary">Start Registration</a>
+                                }
+                            </div>
+                        </li>
+                        <li class="timeline-item @(Model.Stage > 6 ? "completed" : (Model.Stage == 6 ? "active" : ""))">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">6. Registration</div>
+                                <div class="timeline-desc">Legal transfer and verification.</div>
+                                @if (Model.Stage == 6) {
+                                    <a href="@Url.Action("PayCommission", "Admin", new { id = Model.EnquiryId })" class="btn-action btn-primary">Complete Verification</a>
+                                }
+                            </div>
+                        </li>
+                        <li class="timeline-item @(Model.Stage == 7 ? "completed" : "")">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">7. Commission & Complete</div>
+                                <div class="timeline-desc">Final deal closure.</div>
+                                @if (Model.IsCommissionPaid) {
+                                    <span class="badge-status badge-success">Commission Paid</span>
+                                    @if (Model.Status == "Completed") { <div class="mt-3 text-success fw-bold">Deal Completed</div> }
+                                }
+                                else if (Model.Stage == 7) { <span class="badge-status badge-pending">Pending Commission</span> }
+                            </div>
+                        </li>
+                    }
+                </ul>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT -->
+
+        <div class="col-lg-4 right-sidebar">
+
+            <!-- PARTIES -->
+
+            <div class="section-card">
+
+                <h2 class="card-title">
+                    <i class="fa-solid fa-users"></i>
+                    Parties
+                </h2>
+
+                <div class="stakeholder-card">
+
+                    <div class="stakeholder-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div>
+                        <div class="stakeholder-role">@(string.Equals(Model.Property?.PropertyType, "Rent", StringComparison.OrdinalIgnoreCase) ? "Tenant" : "Buyer")</div>
+                        <div class="stakeholder-name">
+                            @(Model.SenderUser?.FullName ?? "Unknown Buyer")
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="stakeholder-card mb-0">
+
+                    <div class="stakeholder-avatar">
+                        <i class="fa-solid fa-house"></i>
+                    </div>
+
+                    <div>
+                        <div class="stakeholder-role">@(string.Equals(Model.Property?.PropertyType, "Rent", StringComparison.OrdinalIgnoreCase) ? "Owner" : "Seller")</div>
+                        <div class="stakeholder-name">
+                            @(Model.OwnerUser?.FullName ?? "Unknown Seller")
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- FINANCIAL -->
+
+            <div class="section-card">
+
+                <h2 class="card-title">
+                    <i class="fa-solid fa-calculator"></i>
+                    Financials
+                </h2>
+
+                @if (string.Equals(Model.Property?.PropertyType, "Rent", StringComparison.OrdinalIgnoreCase))
+                {
+                    <div class="finance-row">
+                        <span>Monthly Rent</span>
+                        <strong>₹ @((Model.PropertyPrice ?? 0).ToString("N0"))</strong>
+                    </div>
+
+                    <div class="finance-row">
+                        <span>Security Deposit (3 months)</span>
+                        <strong>₹ @(((Model.PropertyPrice ?? 0) * 3).ToString("N0"))</strong>
+                    </div>
+
+                    <div class="finance-row">
+                        <span>Rental Agreement Charges</span>
+                        <strong>₹ 2,500</strong>
+                    </div>
+
+                    <div class="finance-row finance-total">
+                        <span>Brokerage Charges (1 Month)</span>
+                        <strong>
+                            ₹ @((Model.PropertyPrice ?? 0).ToString("N0"))
+                        </strong>
+                    </div>
+                }
+                else
+                {
+                    <div class="finance-row">
+                        <span>Property Price</span>
+                        <strong>₹ @((Model.PropertyPrice ?? 0).ToString("N0"))</strong>
+                    </div>
+
+                    <div class="finance-row">
+                        <span>Token Amount</span>
+                        <strong>₹ 15,000</strong>
+                    </div>
+
+                    <div class="finance-row finance-total">
+                        <span>Commission (2%)</span>
+                        <strong>
+                            ₹ @(((Model.PropertyPrice ?? 0) * 0.02M).ToString("N0"))
+                        </strong>
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Admin Panel</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --sidebar-bg: #1e293b;
+            --sidebar-border: #334155;
+            --sidebar-active: #2563eb;
+            --topbar-bg: #ffffff;
+            --body-bg: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--body-bg);
+            margin: 0;
+            overflow-x: hidden;
+            color: var(--text-main);
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: var(--sidebar-bg);
+            color: #f8fafc;
+            padding-top: 20px;
+            border-right: 1px solid var(--sidebar-border);
+            z-index: 1000;
+        }
+
+        .sidebar h3 {
+            text-align: left;
+            padding: 0 24px;
+            margin-bottom: 30px;
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: -0.025em;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar h3 i {
+            color: #38bdf8;
+        }
+
+        .sidebar-menu {
+            padding: 0 12px;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar a i {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+            color: #94a3b8;
+        }
+
+        .sidebar a:hover {
+            background-color: #334155;
+            color: #ffffff;
+        }
+
+        .sidebar a:hover i {
+            color: #cbd5e1;
+        }
+
+        .sidebar a.active {
+            background-color: #2563eb;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .sidebar a.active i {
+            color: #ffffff;
+        }
+
+        /* TOPBAR */
+        .topbar {
+            height: 64px;
+            width: calc(100% - 250px);
+            margin-left: 250px;
+            background-color: var(--topbar-bg);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 32px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .btn-logout {
+            color: #475569;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+        }
+
+        .btn-logout:hover {
+            background-color: #f1f5f9;
+            color: #0f172a;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: 250px;
+            padding: 32px;
+            min-height: calc(100vh - 64px);
+        }
+
+        /* 🔔 NOTIFICATION */
+        .notification-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin-right: 24px;
+            padding-right: 24px;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .bell {
+            font-size: 20px;
+            cursor: pointer;
+            position: relative;
+            color: #64748b;
+            transition: 0.2s;
+        }
+        
+        .bell:hover {
+            color: #0f172a;
+        }
+
+        .notif-badge {
+            position: absolute;
+            top: -4px;
+            right: -6px;
+            background: #ef4444;
+            color: white;
+            font-size: 10px;
+            padding: 2px 5px;
+            border-radius: 10px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        /* 🔥 DROPDOWN FIXED */
+        .notif-dropdown {
+            position: fixed;
+            top: 60px;
+            right: 32px;
+            width: 320px;
+            background: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 8px;
+            display: none;
+            max-height: 350px;
+            overflow-y: auto;
+            z-index: 99999;
+            border: 1px solid var(--border-color);
+        }
+
+        .notif-header {
+            padding: 12px 16px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+            background: #f8fafc;
+            color: #0f172a;
+            font-size: 0.95rem;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        .notif-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .notif-item:last-child {
+            border-bottom: none;
+        }
+
+        .notif-item:hover {
+            background: #f8fafc;
+        }
+
+        .notif-item strong {
+            font-size: 0.85rem;
+            color: #0f172a;
+            display: block;
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
+
+        .notif-item div {
+            font-size: 0.8rem;
+            color: #475569;
+            margin-bottom: 4px;
+        }
+
+        .notif-item small {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        /* SCROLL STYLE */
+        .notif-dropdown::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .notif-dropdown::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h3><i class="fa-solid fa-building"></i> Real Estate</h3>
+
+        <div class="sidebar-menu">
+            <a href="/Account/AdminDashboard" class="@(ViewData["ActivePage"]?.ToString() == "AdminDashboard" ? "active" : "")"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+            <a href="/Admin/Users"><i class="fa-solid fa-users"></i> Users</a>
+            <a href="/Category/Index"><i class="fa-solid fa-tags"></i> Categories</a>
+            <a href="/State/Index"><i class="fa-solid fa-map"></i> States</a>
+            <a href="/City/Index"><i class="fa-solid fa-city"></i> Cities</a>
+            <a href="/Amenity/Index"><i class="fa-solid fa-list-check"></i> Amenities</a>
+            <a href="/Property/Index"><i class="fa-solid fa-house"></i> Properties</a>
+            <a href="/Admin/Enquiries"><i class="fa-solid fa-envelope"></i> Enquiries</a>
+            <a href="/Admin/DealHistory"><i class="fa-solid fa-file-invoice-dollar"></i> Deal History</a>
+        </div>
+    </div>
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+
+        <!-- 🔔 Notification -->
+        <div class="notification-wrapper">
+            <div class="bell" onclick="toggleDropdown()">
+                <i class="fa-regular fa-bell"></i>
+                <span id="notifCount" class="notif-badge" style="display: none;">0</span>
+            </div>
+        </div>
+
+        <a href="/Account/Logout" class="btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign out</a>
+    </div>
+
+    <!-- 🔥 DROPDOWN OUTSIDE -->
+    <div id="notifDropdown" class="notif-dropdown">
+        <div class="notif-header">Alerts</div>
+        <div id="notifList">
+            <div class="text-center p-3 text-muted" id="emptyNotifMsg" style="font-size: 0.85rem;">No new alerts</div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        @RenderBody()
+    </div>
+
+    <!-- 🔥 JS -->
+    <script>
+        let notifications = [];
+        let shownIds = [];
+
+        function toggleDropdown() {
+            let d = document.getElementById("notifDropdown");
+            d.style.display = d.style.display === "block" ? "none" : "block";
+        }
+
+        function loadAdminAlerts() {
+            fetch('/Admin/GetAdminAlerts')
+                .then(res => res.json())
+                .then(data => {
+
+                    data.forEach(item => {
+
+                        if (!shownIds.includes(item.id)) {
+
+                            let msg = "";
+
+                            if (item.status === "Pending") {
+                                msg = `New property added by ${item.user}`;
+                            }
+                            else if (item.status === "EditPending") {
+                                msg = `Edit requested by ${item.user}`;
+                            }
+                            else if (item.status === "DeleteRequested") {
+                                msg = `Delete requested by ${item.user}`;
+                            }
+
+                            if (msg) {
+                                notifications.unshift({
+                                    id: item.id,
+                                    text: msg,
+                                    title: item.title,
+                                    time: item.time
+                                });
+
+                                shownIds.push(item.id);
+                            }
+                        }
+
+                    });
+
+                    renderNotifications();
+                });
+        }
+
+        function renderNotifications() {
+            let list = document.getElementById("notifList");
+            let count = document.getElementById("notifCount");
+
+            if (notifications.length === 0) {
+                list.innerHTML = `<div class="text-center p-3 text-muted" style="font-size: 0.85rem;">No new alerts</div>`;
+                count.style.display = "none";
+                return;
+            }
+
+            list.innerHTML = "";
+            
+            notifications.forEach(n => {
+                let div = document.createElement("div");
+                div.className = "notif-item";
+
+                div.innerHTML = `
+                    <strong>${n.text}</strong>
+                    <div>${n.title}</div>
+                    <small>${n.time}</small>
+                `;
+
+                div.onclick = function () {
+                    window.location.href = "/Property/Index";
+                };
+
+                list.appendChild(div);
+            });
+
+            count.innerText = notifications.length;
+            count.style.display = "inline-block";
+        }
+
+        // 🔁 AUTO REFRESH
+        setInterval(loadAdminAlerts, 5000);
+        // Load initially
+        loadAdminAlerts();
+
+        // ❌ CLOSE ON OUTSIDE CLICK
+        document.addEventListener("click", function (e) {
+            let bell = document.querySelector(".bell");
+            let dropdown = document.getElementById("notifDropdown");
+
+            if (!bell.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.style.display = "none";
+            }
+        });
+    </script>
+
+</body>
+</html>

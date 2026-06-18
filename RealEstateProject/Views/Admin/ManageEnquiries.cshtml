@@ -1,0 +1,128 @@
+@model IEnumerable<RealEstateProject.Models.Enquiry>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Manage Enquiries";
+}
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .page-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-main);
+        margin: 0;
+    }
+
+    .page-subtitle {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        margin: 4px 0 0 0;
+    }
+
+    .section-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table th {
+        background: #f8fafc;
+        padding: 12px 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .data-table td {
+        padding: 16px 20px;
+        font-size: 0.875rem;
+        color: var(--text-main);
+        border-bottom: 1px solid var(--border-color);
+        vertical-align: middle;
+    }
+
+    .data-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .data-table tr:hover td {
+        background-color: #f8fafc;
+    }
+
+    .prop-title {
+        font-weight: 500;
+        color: #0f172a;
+    }
+
+    .user-name {
+        font-weight: 500;
+        color: #2563eb;
+    }
+    
+    .owner-name {
+        font-weight: 500;
+        color: #16a34a;
+    }
+</style>
+
+<div class="container-fluid p-0">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Manage Enquiries</h1>
+            <p class="page-subtitle">A list of all raw property enquiries.</p>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th>Sender</th>
+                        <th>Owner</th>
+                        <th>Message</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var e in Model)
+                    {
+                        <tr>
+                            <td><span class="prop-title">@e.Property?.Title</span></td>
+                            <td><span class="user-name">@e.SenderUser?.FullName</span></td>
+                            <td><span class="owner-name">@e.OwnerUser?.FullName</span></td>
+                            <td><span class="text-muted" style="font-size: 0.875rem;">@e.Message</span></td>
+                            <td>@e.Status</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if(!Model.Any())
+            {
+                <div class="text-center py-5 text-muted" style="font-size: 0.875rem;">
+                    <p class="m-0">No enquiries found.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

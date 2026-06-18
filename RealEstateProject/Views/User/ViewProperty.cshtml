@@ -1,0 +1,551 @@
+@model RealEstateProject.Models.Property
+
+@{
+    ViewData["Title"] = "Property Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var sessionUserId = Context.Session.GetString("UserId");
+
+    int? currentUserId = string.IsNullOrEmpty(sessionUserId)
+        ? (int?)null
+        : Convert.ToInt32(sessionUserId);
+        
+    var images = Model.ProperyImages?.ToList();
+    if (images == null)
+    {
+        images = new List<RealEstateProject.Models.ProperyImage>();
+    }
+    var displayImages = images.Take(5).ToList();
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+    <!-- Swiper -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #0d6efd; 
+            --dark: #222222;
+            --muted: #717171;
+            --border: #dddddd;
+            --bg: #ffffff;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg);
+            font-family: 'Outfit', sans-serif;
+            color: var(--dark);
+        }
+
+        .property-page { padding: 30px 15px 80px; max-width: 1120px; margin: 0 auto; }
+        
+        h1 { font-size: 26px; font-weight: 600; color: #222; margin-bottom: 6px; line-height: 30px; }
+        .subtitle { font-size: 15px; font-weight: 500; color: var(--dark); text-decoration: underline; cursor: pointer; margin-bottom: 24px; display: inline-block; }
+        
+        /* Status Badge */
+        .badge-status {
+            display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .status-available { background: #e6f6ec; color: #1e7e34; border: 1px solid #c3e6cb; }
+        .status-sold { background: #fce8e6; color: #d93025; border: 1px solid #f5c6cb; }
+        .status-rented { background: #fef1e6; color: #e37400; border: 1px solid #ffeeba; }
+
+        /* Photo Grid */
+        .photo-grid-container {
+            display: flex; gap: 8px; border-radius: 12px; overflow: hidden; height: 460px; position: relative; margin-bottom: 40px;
+        }
+        .photo-grid-main { width: 50%; height: 100%; position: relative; }
+        .photo-grid-side { width: 50%; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px; height: 100%; }
+        
+        .grid-img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.2s, filter 0.2s; cursor: pointer; }
+        .photo-grid-container:hover .grid-img { filter: brightness(0.8); }
+        .grid-img:hover { filter: brightness(1) !important; }
+        
+        .show-all-btn {
+            position: absolute; bottom: 24px; right: 24px;
+            background: #fff; border: 1px solid #222; border-radius: 8px;
+            padding: 7px 15px; font-weight: 600; font-size: 14px;
+            cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.18);
+            display: flex; align-items: center; gap: 8px; transition: transform 0.1s;
+            color: var(--dark); text-decoration: none;
+        }
+        .show-all-btn:hover { background: #f7f7f7; color: var(--dark); }
+        .show-all-btn:active { transform: scale(0.96); }
+
+        /* Left Column Details */
+        .property-details { padding-right: 8%; }
+        .section-divider { border-top: 1px solid var(--border); margin: 32px 0; }
+        
+        .host-header { display: flex; justify-content: space-between; align-items: center; }
+        .host-title { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+        .host-subtitle { font-size: 15px; color: var(--muted); }
+        .host-avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; }
+        
+        .stats-row { display: flex; align-items: center; gap: 16px; font-size: 16px; margin-bottom: 24px; flex-wrap: wrap; color: var(--dark); }
+        
+        .detail-section-title { font-size: 22px; font-weight: 600; margin-bottom: 24px; }
+        .description-text { font-size: 16px; color: var(--dark); line-height: 24px; white-space: pre-wrap; font-weight: 300; }
+        
+        /* Amenities */
+        .amenity-list { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .amenity-item { display: flex; align-items: center; gap: 16px; font-size: 16px; color: var(--dark); font-weight: 300; }
+        .amenity-icon { font-size: 22px; width: 32px; color: var(--dark); text-align: center; opacity: 0.8; }
+        
+        /* Overview Grid */
+        .overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .overview-box { padding-bottom: 8px; }
+        .overview-label { font-size: 14px; color: var(--muted); margin-bottom: 4px; }
+        .overview-value { font-size: 16px; font-weight: 500; color: var(--dark); }
+
+        /* Right Sidebar Card */
+        .action-sidebar { position: sticky; top: 30px; }
+        .action-card {
+            border: 1px solid var(--border); border-radius: 12px; padding: 24px;
+            box-shadow: rgba(0, 0, 0, 0.12) 0px 6px 16px; background: #fff;
+        }
+        .card-price { font-size: 22px; font-weight: 600; margin-bottom: 24px; display: flex; align-items: baseline; gap: 4px; }
+        
+        .btn-action {
+            width: 100%; border-radius: 8px; padding: 14px; font-size: 16px; font-weight: 600;
+            cursor: pointer; border: none; transition: background 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-primary-custom { background: var(--primary); color: #fff; }
+        .btn-primary-custom:hover { background: #0b5ed7; color: #fff; }
+        
+        .btn-outline-custom { background: #fff; color: var(--dark); border: 1px solid var(--dark); margin-top: 12px; }
+        .btn-outline-custom:hover { background: #f7f7f7; color: var(--dark); }
+
+        .btn-sold { background: #f8f9fa; color: #dc3545; border: 1px solid #dc3545; cursor: not-allowed; }
+        .btn-rented { background: #f8f9fa; color: #fd7e14; border: 1px solid #fd7e14; cursor: not-allowed; }
+
+        /* Reviews */
+        .review-card { margin-bottom: 32px; }
+        .review-header { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+        .review-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+        .review-name { font-weight: 600; font-size: 16px; margin-bottom: 2px; }
+        .review-date { font-size: 14px; color: var(--muted); }
+        .review-rating { color: var(--dark); font-size: 12px; margin-bottom: 8px; }
+        .review-text { font-size: 16px; line-height: 24px; font-weight: 300; }
+        
+        .form-control, .form-select { border-radius: 8px; padding: 12px 16px; border: 1px solid var(--border); font-size: 16px; }
+        .form-control:focus, .form-select:focus { border-color: #222; box-shadow: none; outline: 1px solid #222; }
+
+        /* Modal Gallery */
+        .gallery-modal .modal-dialog { max-width: 100%; margin: 0; height: 100vh; }
+        .gallery-modal .modal-content { background: #fff; height: 100vh; border-radius: 0; border: none; }
+        .gallery-modal .modal-body { padding: 0; display: flex; align-items: center; justify-content: center; background: #000; position: relative; }
+        .gallery-modal .btn-close { position: absolute; top: 20px; right: 20px; z-index: 1055; filter: invert(1); background-size: 12px; opacity: 0.8; }
+        .gallery-modal .btn-close:hover { opacity: 1; }
+        
+        .gallery-swiper { width: 100%; height: 85vh; }
+        .gallery-swiper .swiper-slide { display: flex; align-items: center; justify-content: center; }
+        .gallery-swiper .swiper-slide img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .swiper-button-next, .swiper-button-prev { color: #fff; background: rgba(255,255,255,0.1); border-radius: 50%; width: 50px; height: 50px; }
+        .swiper-button-next:hover, .swiper-button-prev:hover { background: rgba(255,255,255,0.2); }
+        .swiper-button-next::after, .swiper-button-prev::after { font-size: 20px; }
+
+        @@media(max-width:992px) {
+            .property-details { padding-right: 0; }
+            .action-sidebar { margin-top: 40px; position: relative; top: 0; }
+            .photo-grid-container { height: 360px; }
+        }
+        @@media(max-width:768px) {
+            .photo-grid-container { height: 260px; border-radius: 0; margin-left: -15px; margin-right: -15px; margin-top: -15px; margin-bottom: 24px; }
+            .photo-grid-side { display: none; }
+            .photo-grid-main { width: 100%; }
+            .amenity-list { grid-template-columns: 1fr; }
+            .overview-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="property-page">
+        <!-- Alerts -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert" style="border-radius: 8px;">
+                <i class="fa-solid fa-circle-check me-2"></i> @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert" style="border-radius: 8px;">
+                <i class="fa-solid fa-circle-xmark me-2"></i> @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <!-- Header -->
+        <div class="mb-4">
+            <h1>@Model.Title</h1>
+            <div class="subtitle">
+                @Model.Address, @(Model.City?.CityName ?? "Location N/A")
+            </div>
+        </div>
+
+        <!-- Photo Grid -->
+        <div class="photo-grid-container">
+            @if (images.Count > 0)
+            {
+                <div class="photo-grid-main" data-bs-toggle="modal" data-bs-target="#galleryModal">
+                    <img src="@Url.Content(displayImages[0].ImagePath)" class="grid-img" alt="Main Property Image" />
+                </div>
+                <div class="photo-grid-side">
+                    @for (int i = 1; i < displayImages.Count; i++)
+                    {
+                        <div style="width: 100%; height: 100%; overflow: hidden;" data-bs-toggle="modal" data-bs-target="#galleryModal">
+                            <img src="@Url.Content(displayImages[i].ImagePath)" class="grid-img" alt="Property Image" />
+                        </div>
+                    }
+                    @for (int i = displayImages.Count; i < 5; i++)
+                    {
+                        <div style="background: #f0f0f0; width: 100%; height: 100%;"></div>
+                    }
+                </div>
+                
+                <button class="show-all-btn" data-bs-toggle="modal" data-bs-target="#galleryModal">
+                    <i class="fa-solid fa-braille"></i> Show all photos
+                </button>
+            }
+            else
+            {
+                <div class="photo-grid-main" style="width: 100%;">
+                    <img src="@Url.Content("~/images/default-property.jpg")" class="grid-img" alt="Default Property" />
+                </div>
+            }
+        </div>
+
+        <div class="row">
+            <!-- Left Column: Details -->
+            <div class="col-lg-8 property-details">
+                
+                <!-- Status & Host -->
+                <div class="host-header">
+                    <div>
+                        @{
+                            string badgeClass = "status-available";
+                            if (Model.Status == "Sold") badgeClass = "status-sold";
+                            else if (Model.Status == "Rented") badgeClass = "status-rented";
+                        }
+                        <div class="badge-status @badgeClass">
+                            @Model.Status
+                        </div>
+                        
+                        <div class="host-title">
+                            @(Model.Category?.CategoryName ?? "Property") hosted by @Model.User?.FullName
+                        </div>
+                        
+                        <div class="stats-row">
+                            <span>@Model.Bedroom bedrooms</span>
+                            <span>·</span>
+                            <span>@Model.Bathrooms baths</span>
+                            <span>·</span>
+                            <span>@Model.AreaSqft sqft</span>
+                            <span>·</span>
+                            <span>@Model.Furnishing</span>
+                        </div>
+                    </div>
+                    
+                    <img src="@Url.Content(Model.User?.ProfileImage ?? "~/images/profile/default.png")" class="host-avatar" alt="Host Profile" />
+                </div>
+                
+                <div class="section-divider"></div>
+                
+                <!-- Description -->
+                <div>
+                    <div class="detail-section-title">About this space</div>
+                    <div class="description-text">@Model.Description</div>
+                </div>
+                
+                <div class="section-divider"></div>
+                
+                <!-- Amenities -->
+                <div>
+                    <div class="detail-section-title">What this place offers</div>
+                    <div class="amenity-list">
+                        @foreach (var pa in Model.PropertyAmenities)
+                        {
+                            <div class="amenity-item">
+                                <div class="amenity-icon"><i class="fa-solid fa-check"></i></div>
+                                <div>
+                                    <div>@pa.Amenity.AmenityName</div>
+                                    @if (!string.IsNullOrEmpty(pa.Amenity.Description))
+                                    {
+                                        <div style="font-size: 14px; color: var(--muted); margin-top: 2px;">@pa.Amenity.Description</div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                
+                <div class="section-divider"></div>
+                
+                <!-- Overview -->
+                <div>
+                    <div class="detail-section-title">Property Overview</div>
+                    <div class="overview-grid">
+                        <div class="overview-box">
+                            <div class="overview-label">Category</div>
+                            <div class="overview-value">@(Model.Category?.CategoryName ?? "N/A")</div>
+                        </div>
+                        <div class="overview-box">
+                            <div class="overview-label">Property Type</div>
+                            <div class="overview-value">@Model.PropertyType</div>
+                        </div>
+                        <div class="overview-box">
+                            <div class="overview-label">Posted On</div>
+                            <div class="overview-value">@Model.CreatedAt.ToString("dd MMM yyyy")</div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.VideoUrl))
+                {
+                    <div class="section-divider"></div>
+                    <div>
+                        <div class="detail-section-title">Property Video</div>
+                        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; background: #000;">
+                            <video controls style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                                <source src="@Url.Content(Model.VideoUrl)" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    </div>
+                }
+
+                <div class="section-divider"></div>
+                
+                <!-- Reviews -->
+                <div>
+                    <div class="detail-section-title">
+                        <i class="fa-solid fa-star" style="font-size: 18px; margin-right: 8px;"></i>
+                        Reviews
+                    </div>
+                    
+                    @if (Model.Reviews != null && Model.Reviews.Any())
+                    {
+                        <div class="row">
+                            @foreach(var review in Model.Reviews)
+                            {
+                                <div class="col-md-6 review-card">
+                                    <div class="review-header">
+                                        <img src="@Url.Content(review.User?.ProfileImage ?? "~/images/profile/default.png")" class="review-avatar" />
+                                        <div>
+                                            <div class="review-name">@review.User?.FullName</div>
+                                        </div>
+                                    </div>
+                                    <div class="review-rating">
+                                        @for(int i = 0; i < review.Rating; i++) { <i class="fa-solid fa-star"></i> }
+                                        @for(int i = review.Rating; i < 5; i++) { <i class="fa-regular fa-star"></i> }
+                                    </div>
+                                    <div class="review-text">@review.Comment</div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="description-text">No reviews yet. Be the first to review this property!</p>
+                    }
+
+                    <!-- Add Review -->
+                    @if (currentUserId != null && currentUserId != Model.UserId)
+                    {
+                        <div class="mt-4 p-4 border rounded-3 bg-light">
+                            <h5 class="mb-3" style="font-weight: 600;">Leave a Review</h5>
+                            <form asp-controller="User" asp-action="AddReview" method="post">
+                                <input type="hidden" name="propertyId" value="@Model.ProperyId" />
+                                <div class="mb-3">
+                                    <select name="rating" class="form-select" required style="width: 200px;">
+                                        <option value="" disabled selected>Select Rating...</option>
+                                        <option value="5">5 - Excellent</option>
+                                        <option value="4">4 - Good</option>
+                                        <option value="3">3 - Average</option>
+                                        <option value="2">2 - Poor</option>
+                                        <option value="1">1 - Terrible</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <textarea name="comment" class="form-control" rows="3" required placeholder="Write your experience..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-dark fw-bold px-4 rounded-3 py-2">Submit</button>
+                            </form>
+                        </div>
+                    }
+                    else if (currentUserId == null)
+                    {
+                        <div class="mt-4 p-3 border rounded-3 bg-light">
+                            Please <a asp-controller="Account" asp-action="Login" class="fw-bold text-dark text-decoration-underline">login</a> to leave a review.
+                        </div>
+                    }
+                </div>
+                
+            </div>
+
+            <!-- Right Column: Action Card -->
+            <div class="col-lg-4">
+                <div class="action-sidebar">
+                    <div class="action-card">
+                        <div class="card-price">
+                            ₹@Model.Price.ToString("N0")
+                            @if (Model.PropertyType == "Rent")
+                            {
+                                <span style="font-size: 16px; font-weight: 400; color: var(--muted);">/ month</span>
+                            }
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            @if (Model.Status == "Sold")
+                            {
+                                <button class="btn-action btn-sold" disabled>
+                                    <i class="fa-solid fa-handshake-slash"></i> Property Sold
+                                </button>
+                            }
+                            else if (Model.Status == "Rented")
+                            {
+                                <button class="btn-action btn-rented" disabled>
+                                    <i class="fa-solid fa-key"></i> Property Rented
+                                </button>
+                            }
+                            else if (currentUserId == null)
+                            {
+                                <a asp-controller="Account" asp-action="Login" class="btn-action btn-primary-custom text-decoration-none">
+                                    <i class="fa-solid fa-lock"></i> Login to Enquire
+                                </a>
+                            }
+                            else if (Model.UserId == currentUserId)
+                            {
+                                <div class="alert alert-secondary text-center fw-bold mb-0" style="border-radius: 8px; border: none; background: #f7f7f7;">
+                                    You own this property
+                                </div>
+                            }
+                            else
+                            {
+                                <button class="btn-action btn-primary-custom" data-bs-toggle="modal" data-bs-target="#enquiryModal">
+                                    Send Enquiry
+                                </button>
+                            }
+                            
+                            <button class="btn-action btn-outline-custom">
+                                <i class="fa-solid fa-phone"></i> Contact Host
+                            </button>
+                        </div>
+                        
+                        <div class="text-center mt-3" style="font-size: 14px; color: var(--muted);">
+                            You won't be charged yet
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 text-center">
+                        <a href="#" class="text-dark text-decoration-underline" style="font-size: 14px; font-weight: 500;">
+                            <i class="fa-solid fa-flag me-1"></i> Report this listing
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Enquiry Modal -->
+    @if (Model.Status != "Sold" && Model.Status != "Rented")
+    {
+        <div class="modal fade" id="enquiryModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="border-radius: 12px; border: none;">
+                    <form asp-controller="Enquiry" asp-action="SendEnquiry" method="post">
+                        <div class="modal-header border-bottom">
+                            <h5 class="modal-title fw-bold">Contact Host</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <input type="hidden" name="PropertyId" value="@Model.ProperyId" />
+                            <label class="form-label fw-semibold mb-2">Message</label>
+                            <textarea name="Message" class="form-control" rows="4" placeholder="Hi, I'm interested in this property..." required></textarea>
+                        </div>
+                        <div class="modal-footer border-0 p-4 pt-0">
+                            <button type="submit" class="btn-action btn-primary-custom w-100">
+                                Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Gallery Modal -->
+    <div class="modal fade gallery-modal" id="galleryModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-body">
+                    <div class="swiper gallery-swiper">
+                        <div class="swiper-wrapper">
+                            @if (images != null && images.Any())
+                            {
+                                foreach (var img in images)
+                                {
+                                    <div class="swiper-slide">
+                                        <img src="@Url.Content(img.ImagePath)" alt="Gallery Image" />
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="swiper-slide">
+                                    <img src="@Url.Content("~/images/default-property.jpg")" alt="Default Property" />
+                                </div>
+                            }
+                        </div>
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize Gallery Swiper inside Modal
+            var galleryModalEl = document.getElementById('galleryModal');
+            var gallerySwiper = null;
+            
+            galleryModalEl.addEventListener('shown.bs.modal', function () {
+                if (!gallerySwiper) {
+                    gallerySwiper = new Swiper('.gallery-swiper', {
+                        loop: true,
+                        navigation: {
+                            nextEl: '.swiper-button-next',
+                            prevEl: '.swiper-button-prev',
+                        },
+                        keyboard: {
+                            enabled: true,
+                            onlyInViewport: false,
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
